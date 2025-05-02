@@ -1,0 +1,563 @@
+body {
+  background-image: url(./image/backgroundas.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.logo img {
+  height: 60px; /* arba kiek reikia */
+}
+
+.logo span {
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  /* background-color: #0d1117; */
+  color: #ffffff;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  /* background-color: #0d1117; */
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #4cc2ff;
+}
+nav a {
+  margin: 0 1rem;
+  color: #c9d1d9;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* pagrindinis langas */
+.hero {
+  padding: 4rem 2rem;
+  /* background: #0d1117; */
+  position: relative;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-text h1 {
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.hero-text p {
+  color: #c1c8d3;
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+.hero-image {
+  margin-left: -270px;
+}
+.hero-image img {
+  max-width: 580px;
+  width: 100%;
+  /* margin-left: -100px; tai perstumia paveikslėlį arčiau teksto */
+  filter: drop-shadow(0px 20px 20px rgba(76, 194, 255, 0.1));
+}
+
+.button.gradient {
+  position: relative;
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  border-radius: 12px;
+  background: linear-gradient(to right, #4400ff0d, #01f1ff2e);
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  z-index: 1;
+  overflow: hidden;
+  border: 1px solid;
+  border-color: #8181ad70;
+}
+
+.button.gradient:hover {
+  box-shadow: 0 0 8px #73d0ff88;
+}
+
+/* boxai */
+
+.card-section {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem;
+  height: 400px;
+}
+
+.card-nft {
+  position: relative;
+  padding: 0px 0px 0px 30px;
+  border-radius: 20px;
+  background-color: #0d1117;
+  max-width: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.card-nft::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #a400ff, #4cc2ff);
+  border-radius: 22px;
+  z-index: -1;
+}
+
+.card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.card-image {
+  position: relative;
+  left: -120px; /* kiek monetą įstumiam į tekstą */
+  top: 30px;
+}
+
+.card-image img {
+  width: 240px;
+  height: auto;
+  margin-left: -10px; /* pritraukia arčiau teksto */
+}
+
+.card p {
+  font-size: 0.95rem;
+  color: #c1c8d3;
+}
+
+.button.gradient {
+  margin-top: 1rem;
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(to right, #a400ff, #4cc2ff);
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.button.gradient:hover {
+  filter: brightness(1.15);
+}
+
+.be-part {
+  flex: 1;
+}
+
+.be-part h3 {
+  font-size: 2.5rem;
+  margin: 0px 0px 3px 0px;
+  width: 300px;
+}
+
+.be-part .label {
+  font-size: 0.9rem;
+  color: #c1c8d3;
+  margin-bottom: 50px;
+  width: 210px;
+}
+
+.be-part .button.gradient {
+  position: relative;
+  margin-bottom: -25px;
+}
+
+/* box prie coino */
+.presale-card {
+  position: relative;
+  padding: 0px 0px 0px 30px;
+  border-radius: 20px;
+  background-color: #0d1117;
+  max-width: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Gradientinis borderis per pseudo elementą */
+.presale-card::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #a400ff, #4cc2ff);
+  border-radius: 22px;
+  z-index: -1;
+}
+.presale-text {
+  flex: 1;
+}
+
+.presale-text h3 {
+  font-size: 3rem;
+  margin: 0px 0px 3px 0px;
+}
+
+.presale-text .price {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 15px 0px 0px 0px;
+}
+
+.presale-text .label {
+  font-size: 0.9rem;
+  color: #c1c8d3;
+  margin-bottom: 1rem;
+}
+.presale-image {
+  position: relative;
+  left: -10px; /* kiek monetą įstumiam į tekstą */
+}
+
+.presale-image img {
+  width: 260px;
+  height: auto;
+  margin-left: -10px; /* pritraukia arčiau teksto */
+}
+
+.button.gradient {
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(to right, #a400ff, #4cc2ff);
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.button.gradient:hover {
+  filter: brightness(1.1);
+}
+
+/* dar kazkas */
+.connect_wallet_button {
+  background-color: transparent;
+  color: #4cc2ff;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #4cc2ff;
+  border-radius: 17px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.connect_wallet_button:hover {
+  background-color: transparent;
+  color: rgb(225, 22, 222);
+  border: 2px solid rgb(225, 22, 222);
+  transition: 0.5s;
+}
+
+.section {
+  padding: 4rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.tokenomics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.tokenomics div {
+  background: #161b22;
+  padding: 1.5rem;
+  border-radius: 10px;
+  flex: 1 1 200px;
+}
+
+/* roadmap */
+.roadmap {
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.roadmap h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.roadmap .subtitle {
+  font-size: 1.1rem;
+  color: #aaa;
+  margin-bottom: 3rem;
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.phase {
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 2px solid;
+  border-color: #4cc2ff;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  transition: 0.3s ease;
+}
+
+.phase h4 {
+  color: #8f94ff;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.phase h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.phase ul {
+  padding-left: 1.2rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  color: #ddd;
+}
+
+/* token destribution */
+
+.token-distribution {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.token-distribution h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.token-chart {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 50px;
+}
+
+.chart {
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #4cc9f0 0% 15%,
+    #4895ef 15% 20%,
+    #4361ee 20% 40%,
+    #3f37c9 40% 50%,
+    #560bad 50% 70%,
+    #7209b7 70% 85%,
+    #b5179e 85% 100%
+  );
+  position: relative;
+}
+
+/* Centrinis apskritimas (užmaskuoti vidų) */
+.chart::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background-color: #0f0e1d; /* tas pats kaip background */
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.token-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.token-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.token-list span {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--c);
+}
+
+/* presale */
+.presale-container {
+  background: #12172a;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  width: 320px;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 100px;
+}
+
+.presale-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.progress-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+  background: #1f263a;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #19c5ff, #5b7cff);
+  height: 100%;
+  width: 0;
+  transition: width 0.3s ease-in-out;
+}
+
+#progress-text {
+  font-size: 0.875rem;
+  color: #a0aec0;
+  margin-top: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #a0aec0;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  text-align: left;
+}
+
+.presale-container input[type="number"],
+select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #1f263a;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.token-output-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1f263a;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.token-output-wrapper img {
+  width: 24px;
+  height: 24px;
+  margin-left: 0.5rem;
+}
+
+.presale-container button {
+  background: linear-gradient(90deg, #19c5ff, #5b7cff);
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+.presale-container button:hover {
+  background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+}
+
+.token-icon {
+  height: 37px;
+}
+
+.pay-input {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  align-content: flex-end;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  gap: 30px;
+}
+.receive-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  gap: 0px;
+}
