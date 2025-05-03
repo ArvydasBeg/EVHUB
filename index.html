@@ -11,7 +11,11 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
     <script src="./index.js" defer></script>
+
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;700&display=swap");
     </style>
@@ -70,7 +74,7 @@
           <h3>is Live!</h3>
           <p class="price">$0.0002</p>
           <p class="label">Current Token Price</p>
-          <a href="#" class="button gradient">Buy Now</a>
+          <a href="#presale-container" class="button gradient">Buy Now</a>
         </div>
         <div class="presale-image">
           <img src="/image/coin be fono.png" alt="Token Icon" />
@@ -188,40 +192,73 @@
     </section>
 
     <!-- presale inikacija -->
+    <div class="presale-wrapper">
+      <div class="presale-left">
+        <!-- Tavo esama forma čia liks kaip yra -->
+        <section class="presale-container">
+          <h2>Presale Stage 1</h2>
 
-    <section class="presale-container">
-      <h2>Presale Stage 1</h2>
+          <div class="progress-wrapper">
+            <div class="progress-stats">
+              <p>
+                <strong>Total Raised:</strong> $<span id="live-total"
+                  >0.00</span
+                >
+              </p>
+              <p>
+                <strong>Remaining:</strong> $<span id="live-remaining"
+                  >16,000,000</span
+                >
+              </p>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">0% completed</p>
+          </div>
 
-      <div class="progress-wrapper">
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <p id="progress-text">0% completed</p>
+          <div class="form-box">
+            <p class="label">You Pay</p>
+            <div class="pay-input">
+              <input type="number" id="amount" placeholder="0.00" />
+              <select id="payment-token">
+                <option value="USDC">USDC</option>
+                <option value="BNB">BNB</option>
+                <option value="ETH">ETH</option>
+              </select>
+            </div>
+
+            <p id="usd-equivalent" class="label">≈ $0.00</p>
+
+            <p class="label">You Receive</p>
+            <div class="receive-box">
+              <p id="token-output">0</p>
+              <img
+                src="/image/Ikona be fono.png"
+                alt="EVHUB Token"
+                class="token-icon"
+              />
+            </div>
+
+            <button id="buy-button">Buy EVHUB</button>
+            <p
+              id="hardcap-reached"
+              class="label"
+              style="display: none; color: #ff4c4c; font-weight: 600"
+            >
+              🚫 Hardcap reached – further purchases are disabled.
+            </p>
+          </div>
+        </section>
       </div>
-
-      <div class="form-box">
-        <p class="label">You Pay</p>
-        <div class="pay-input">
-          <input type="number" id="amount" placeholder="0.00" />
-          <select id="payment-token">
-            <option value="ETH">ETH</option>
-            <option value="BNB">BNB</option>
-            <option value="USDT">USDT</option>
-          </select>
-        </div>
-
-        <p class="label">You Receive</p>
-        <div class="receive-box">
-          <p id="token-output">0</p>
-          <img
-            src="/image/Ikona be fono.png"
-            alt="EVHUB Token"
-            class="token-icon"
-          />
-        </div>
-
-        <button id="buy-button">Buy EVHUB</button>
+      <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ul id="leaderboard-list">
+          <!-- Šie elementai bus pildomi dinamiškai -->
+        </ul>
       </div>
-    </section>
+    </div>
+    <!-- Toast container -->
+    <div id="toast" class="toast hidden">✅ Wallet connected</div>
   </body>
 </html>
