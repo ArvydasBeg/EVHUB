@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadTotalRaised() {
     try {
-      const res = await fetch("http://localhost:3000/raised");
+      const res = await fetch("https://evhub-production.up.railway.app/raised");
       const data = await res.json();
       totalRaised = data.raised || 0;
       updateProgress();
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
       usdDisplay.textContent = "≈ $0.00";
       showToast("🎉 Purchase sent!");
 
-      await fetch("http://localhost:3000/buy", {
+      await fetchfetch("https://evhub-production.up.railway.app/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -189,11 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
 
-      await fetch("http://localhost:3000/update-raised", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: usd }),
-      });
+      await fetchfetch(
+        "https://evhub-production.up.railway.app/update-raised",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: usd }),
+        }
+      );
     } catch (err) {
       console.error("TX Error:", err);
       showToast(
@@ -223,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let lastTopWallet = null; // išorėje virš funkcijos
 async function loadLeaderboard() {
   try {
-    const res = await fetch("http://localhost:3000/buyers");
+    const res = await fetch("https://evhub-production.up.railway.app/buyers");
     const text = await res.text();
 
     const rows = text.trim().split("\n");
