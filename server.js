@@ -1,4 +1,7 @@
+// bendravimas su railway
+
 // === BACKEND: server.js ===
+
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
@@ -89,4 +92,16 @@ app.post("/update-raised", (req, res) => {
     JSON.stringify({ total: updated }, null, 2)
   );
   res.sendStatus(200);
+});
+
+// txt failo siuntimas
+
+app.get("/buyers.txt", (req, res) => {
+  const password = req.query.key;
+
+  if (password !== "ArvydasBeg21.") {
+    return res.status(403).send("❌ Unauthorized");
+  }
+
+  res.sendFile(path.join(__dirname, "buyers.txt"));
 });
