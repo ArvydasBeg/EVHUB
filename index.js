@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
       usdDisplay.textContent = "≈ $0.00";
       showToast("🎉 Purchase sent!");
 
-      await fetchfetch("https://evhub-production.up.railway.app/buy", {
+      await fetch("https://evhub-production.up.railway.app/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -189,14 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
 
-      await fetchfetch(
-        "https://evhub-production.up.railway.app/update-raised",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: usd }),
-        }
-      );
+      await fetch("https://evhub-production.up.railway.app/update-raised", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: usd }),
+      });
     } catch (err) {
       console.error("TX Error:", err);
       showToast(
