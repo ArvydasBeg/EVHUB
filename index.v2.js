@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function connectWallet() {
     if (!window.ethereum) return showToast("⚠️ MetaMask not found");
 
-    const requiredChainId = "0x61";
+    const requiredChainId = "0x38";
 
     try {
       const currentChainId = await window.ethereum.request({
@@ -120,14 +120,14 @@ document.addEventListener("DOMContentLoaded", () => {
               params: [
                 {
                   chainId: requiredChainId,
-                  chainName: "BSC Testnet",
-                  rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545"],
+                  chainName: "Binance Smart Chain",
+                  rpcUrls: ["https://bsc-dataseed.binance.org"],
                   nativeCurrency: {
-                    name: "tBNB",
-                    symbol: "tBNB",
+                    name: "BNB",
+                    symbol: "BNB",
                     decimals: 18,
                   },
-                  blockExplorerUrls: ["https://testnet.bscscan.com"],
+                  blockExplorerUrls: ["https://bscscan.com"],
                 },
               ],
             });
@@ -162,6 +162,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return showToast("⚠️ Please connect wallet first");
     if (isNaN(amount) || amount <= 0 || !exchangeRates[currency])
       return showToast("⚠️ Enter valid amount");
+
+    const usd = amount * exchangeRates[currency];
+    if (usd < 50) return showToast("⚠️ Minimum contribution is $50");
 
     try {
       showToast("⏳ Waiting for confirmation...");
