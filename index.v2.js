@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentAccount = null;
   let exchangeRates = { ETH: 0, BNB: 0, USDC: 1 };
+  let recipientAddress = "";
 
   async function fetchExchangeRates() {
     try {
@@ -171,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const tx = await signer.sendTransaction({
-        to: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374",
+        to: recipientAddress,
         value: ethers.utils.parseEther(amount.toString()),
       });
 
@@ -217,6 +218,12 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTotalRaised();
   loadLeaderboard();
   setInterval(loadLeaderboard, 10000);
+
+  fetch("/api/address")
+    .then((res) => res.json())
+    .then((data) => {
+      recipientAddress = data.address;
+    });
 });
 //
 //

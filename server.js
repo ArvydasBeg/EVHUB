@@ -1,7 +1,4 @@
-// bendravimas su railway
-
 // === BACKEND: server.js ===
-
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
@@ -104,4 +101,8 @@ app.get("/buyers.txt", (req, res) => {
   }
 
   res.sendFile(path.join(__dirname, "buyers.txt"));
+});
+
+app.get("/api/address", (req, res) => {
+  res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
 });
