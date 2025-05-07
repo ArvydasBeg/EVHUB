@@ -220,9 +220,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(loadLeaderboard, 10000);
 
 fetch("https://evhub-production.up.railway.app/api/address")
-    .then((res) => res.json())
-    .then((data) => {
-      recipientAddress = data.address;
+  .then((res) => res.json())
+  .then((data) => {
+    recipientAddress = data.address;
     });
 });
 //
