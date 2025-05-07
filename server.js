@@ -1,26 +1,55 @@
-// === BACKEND: server.js ===
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const WALLET_LOG = "WalletCalc.txt";
+const TOTAL_RAISED_FILE = "totalRaised.json";
 
 // Middleware
-app.use(cors()); // Leisti užklausas iš kitos kilmės (pvz., 127.0.0.1:5500)
-app.use(express.json()); // Suprasti JSON body
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public"));
 
-// Serve static files (jei reikia)
-app.use(express.static("public")); // jei turi /public folderį
+// === Wallet connect logging ===
+app.post("/log-wallet-connect", (req, res) => {
+  const date = new Date().toISOString();
+  const logLine = `Wallet connect at: ${date}\n`;
+
+  fs.appendFileSync(WALLET_LOG, logLine);
+  console.log("✅ Wallet connect logged:", logLine.trim());
+
+  res.sendStatus(200);
+});
+
+app.get("/wallet-connect-stats", (req, res) => {
+  if (!fs.existsSync(WALLET_LOG)) return res.json({ totalConnects: 0, byDate: {} });
+
+  const content = fs.readFileSync(WALLET_LOG, "utf8");
+  const lines = content.trim().split("\n").filter(line => line.includes("Wallet connect at:"));
+  const byDate = {};
+
+  lines.forEach(line => {
+    const date = line.split("Wallet connect at: ")[1].split("T")[0];
+    byDate[date] = (byDate[date] || 0) + 1;
+  });
+
+  res.json({ totalConnects: lines.length, byDate });
+});
+
+app.get("/download-wallet-log", (req, res) => {
+  const filePath = path.join(__dirname, WALLET_LOG);
+  if (!fs.existsSync(filePath)) return res.status(404).send("Log file not found.");
+  res.download(filePath);
+});
 
 // === POST /buy endpoint ===
 app.post("/buy", (req, res) => {
   const { wallet, amount } = req.body;
 
-  if (!wallet || !amount) {
-    return res.status(400).send("Invalid input");
-  }
+  if (!wallet || !amount) return res.status(400).send("Invalid input");
 
   const entry = `${wallet} | ${amount}\n`;
   fs.appendFile("buyers.txt", entry, (err) => {
@@ -33,7 +62,7 @@ app.post("/buy", (req, res) => {
   });
 });
 
-// === GET /buyers (to read the log file) ===
+// === GET /buyers
 app.get("/buyers", (req, res) => {
   const filePath = path.join(__dirname, "buyers.txt");
   fs.readFile(filePath, "utf8", (err, data) => {
@@ -45,20 +74,18 @@ app.get("/buyers", (req, res) => {
   });
 });
 
-// === Start server ===
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+// === GET /buyers.txt (be slaptažodžio)
+app.get("/buyers.txt", (req, res) => {
+  const filePath = path.join(__dirname, "buyers.txt");
+  if (!fs.existsSync(filePath)) return res.status(404).send("buyers.txt not found");
+  res.sendFile(filePath);
 });
 
-//
-// ===== total raised =======
-const TOTAL_RAISED_FILE = "totalRaised.json";
-// Grąžina dabartinę sumą
+// === GET /raised
 app.get("/raised", (req, res) => {
   try {
-    if (!fs.existsSync(TOTAL_RAISED_FILE)) {
-      return res.json({ raised: 0 });
-    }
+    if (!fs.existsSync(TOTAL_RAISED_FILE)) return res.json({ raised: 0 });
+
     const content = fs.readFileSync(TOTAL_RAISED_FILE, "utf8");
     const data = JSON.parse(content);
     res.json({ raised: data.total || 0 });
@@ -68,7 +95,7 @@ app.get("/raised", (req, res) => {
   }
 });
 
-// Atnaujina sumą (kai pirkimas įvykdomas)
+// === POST /update-raised
 app.post("/update-raised", (req, res) => {
   const { amount } = req.body;
   if (!amount) return res.status(400).send("Missing amount");
@@ -84,25 +111,16 @@ app.post("/update-raised", (req, res) => {
   }
 
   const updated = current + parseFloat(amount);
-  fs.writeFileSync(
-    TOTAL_RAISED_FILE,
-    JSON.stringify({ total: updated }, null, 2)
-  );
+  fs.writeFileSync(TOTAL_RAISED_FILE, JSON.stringify({ total: updated }, null, 2));
   res.sendStatus(200);
 });
 
-// txt failo siuntimas
-
-app.get("/buyers.txt", (req, res) => {
-  const password = req.query.key;
-
-  if (password !== "ArvydasBeg21.") {
-    return res.status(403).send("❌ Unauthorized");
-  }
-
-  res.sendFile(path.join(__dirname, "buyers.txt"));
-});
-
+// === /api/address (grąžina viešą adresą)
 app.get("/api/address", (req, res) => {
   res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
+});
+
+// === Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
