@@ -5,6 +5,23 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
+// Block suspicious bot-like paths
+app.use((req, res, next) => {
+  const blockedPaths = [
+    "/wp-admin/setup-config.php",
+    "/wordpress/wp-admin/setup-config.php",
+    "/.env",
+    "/config.php"
+  ];
+
+  if (blockedPaths.includes(req.path)) {
+    console.log(`Blocked bot attempt on: ${req.path}`);
+    return res.status(403).send("Forbidden");
+  }
+
+  next();
+});
+
 const PORT = 3000;
 
 // Middleware
