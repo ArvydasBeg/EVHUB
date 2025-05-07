@@ -3,11 +3,12 @@ const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
+const app = express();
 let walletConnectLog = [];
-const cors = require("cors");
+
 app.use(cors());
 
-const app = express();
+
 // Block suspicious bot-like paths
 app.use((req, res, next) => {
   const blockedPaths = [
