@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadLeaderboard();
   setInterval(loadLeaderboard, 10000);
 
-  fetch("/api/address")
+fetch("https://evhub-production.up.railway.app/api/address")
     .then((res) => res.json())
     .then((data) => {
       recipientAddress = data.address;
