@@ -4,6 +4,13 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
+const walletLogPath = path.join(__dirname, "WalletCalc.txt");
+
+if (!fs.existsSync(walletLogPath)) {
+  fs.writeFileSync(walletLogPath, "", "utf8");
+  console.log("📁 WalletCalc.txt was created automatically.");
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
