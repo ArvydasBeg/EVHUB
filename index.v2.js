@@ -226,7 +226,13 @@ fetch("https://evhub-production.up.railway.app/api/address")
   .then((res) => res.json())
   .then((data) => {
     recipientAddress = data.address;
-    console.log("✅ Recipient address loaded:", recipientAddress);
+    console.log("✅ Address loaded:", recipientAddress);
+  })
+  .catch((err) => {
+    console.error("❌ Failed to load address", err);
+    showToast("❌ Failed to load wallet address");
+  });
+
   });
 });
 //
