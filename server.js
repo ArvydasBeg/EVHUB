@@ -97,6 +97,23 @@ app.use((req, res, next) => {
 
   next();
 });
+app.get("/wallet-connect-stats", (req, res) => {
+  const filePath = path.join(__dirname, "WalletCalc.txt");
+  if (!fs.existsSync(filePath)) {
+    return res.json({ totalConnects: 0, byDate: {} });
+  }
+
+  const content = fs.readFileSync(filePath, "utf8");
+  const lines = content.trim().split("\n").filter(line => line.includes("Wallet connect at:"));
+  const byDate = {};
+
+  lines.forEach(line => {
+    const date = line.split("Wallet connect at: ")[1].split("T")[0];
+    byDate[date] = (byDate[date] || 0) + 1;
+  });
+
+  res.json({ totalConnects: lines.length, byDate });
+});
 
 // Paleidimas
 const PORT = process.env.PORT || 3000;
