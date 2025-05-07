@@ -100,6 +100,9 @@ app.use((req, res, next) => {
 
   next();
 });
+app.get("/test", (req, res) => {
+  res.send("Test OK");
+});
 
 // === START SERVER ===
 const PORT = process.env.PORT || 8080;
