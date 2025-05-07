@@ -174,6 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!recipientAddress) {
   return showToast("⚠️ Wallet address not loaded.");
 }
+      if (!recipientAddress || recipientAddress === "") {
+  console.error("❌ No recipient address loaded");
+  return showToast("⚠️ Wallet address not loaded");
+}
       const tx = await signer.sendTransaction({
         to: recipientAddress,
         value: ethers.utils.parseEther(amount.toString()),
