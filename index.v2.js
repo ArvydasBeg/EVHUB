@@ -171,6 +171,9 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("⏳ Waiting for confirmation...");
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
+      if (!recipientAddress) {
+  return showToast("⚠️ Wallet address not loaded.");
+}
       const tx = await signer.sendTransaction({
         to: recipientAddress,
         value: ethers.utils.parseEther(amount.toString()),
@@ -223,7 +226,8 @@ fetch("https://evhub-production.up.railway.app/api/address")
   .then((res) => res.json())
   .then((data) => {
     recipientAddress = data.address;
-    });
+    console.log("✅ Recipient address loaded:", recipientAddress);
+  });
 });
 //
 //
