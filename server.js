@@ -104,5 +104,6 @@ app.get("/buyers.txt", (req, res) => {
 });
 
 app.get("/api/address", (req, res) => {
-  res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
+  res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" }); // tavo projekto BSC adresas
 });
+
