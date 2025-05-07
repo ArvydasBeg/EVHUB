@@ -10,18 +10,13 @@ app.use(express.static("public"));
 
 const PASSWORD = "visiemsEVHUB";
 
+// === BUYERS ===
 app.post("/api/save", (req, res) => {
   const { data } = req.body;
-  if (!data) {
-    return res.status(400).send("Data is required");
-  }
+  if (!data) return res.status(400).send("Data is required");
 
   fs.appendFile("buyers.txt", data + "\n", err => {
-    if (err) {
-      console.error("❌ Failed to write to buyers.txt:", err);
-      return res.status(500).send("Failed to save data");
-    }
-
+    if (err) return res.status(500).send("Failed to save data");
     console.log("✅ Saved to buyers.txt:", data);
     res.sendStatus(200);
   });
@@ -29,59 +24,60 @@ app.post("/api/save", (req, res) => {
 
 app.get("/buyers.txt", (req, res) => {
   const password = req.query.password;
-  if (password !== PASSWORD) {
-    return res.status(403).send("Forbidden: Invalid password");
-  }
+  if (password !== PASSWORD) return res.status(403).send("Forbidden");
 
   const filePath = path.join(__dirname, "buyers.txt");
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send("buyers.txt not found");
-  }
+  if (!fs.existsSync(filePath)) return res.status(404).send("buyers.txt not found");
 
   res.sendFile(filePath);
 });
 
-// ✅ POST: wallet connect log į WalletCalc.txt
+// === WALLET CONNECT logging ===
 app.post("/log-wallet-connect", (req, res) => {
   const date = new Date().toISOString();
   const logLine = `Wallet connect at: ${date}\n`;
 
   fs.appendFileSync("WalletCalc.txt", logLine);
   console.log("✅ Logged to WalletCalc.txt:", logLine.trim());
-
   res.sendStatus(200);
 });
 
-// ✅ GET: atsisiųsti WalletCalc.txt failą
 app.get("/download-wallet-log", (req, res) => {
   const filePath = path.join(__dirname, "WalletCalc.txt");
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send("No WalletCalc.txt log found.");
-  }
+  if (!fs.existsSync(filePath)) return res.status(404).send("WalletCalc.txt not found");
 
   res.download(filePath);
 });
 
-// (likusi tavo logika)
+app.get("/wallet-connect-stats", (req, res) => {
+  const filePath = path.join(__dirname, "WalletCalc.txt");
+  if (!fs.existsSync(filePath)) return res.json({ totalConnects: 0, byDate: {} });
+
+  const content = fs.readFileSync(filePath, "utf8");
+  const lines = content.trim().split("\n").filter(line => line.includes("Wallet connect at:"));
+  const byDate = {};
+
+  lines.forEach(line => {
+    const date = line.split("Wallet connect at: ")[1].split("T")[0];
+    byDate[date] = (byDate[date] || 0) + 1;
+  });
+
+  res.json({ totalConnects: lines.length, byDate });
+});
+
+// === WALLET ADDRESS logging ===
 app.post("/api/address", (req, res) => {
   const { address } = req.body;
-  if (!address) {
-    return res.status(400).send("Address is required");
-  }
+  if (!address) return res.status(400).send("Address is required");
 
   fs.appendFile("wallets.txt", address + "\n", err => {
-    if (err) {
-      console.error("❌ Failed to write to wallets.txt:", err);
-      return res.status(500).send("Failed to save address");
-    }
-
+    if (err) return res.status(500).send("Failed to save address");
     console.log("✅ Saved address:", address);
     res.sendStatus(200);
   });
 });
 
-// Botų blokavimas
+// === BLOCK BOTS ===
 app.use((req, res, next) => {
   const blockedPaths = [
     "/wp-admin/setup-config.php",
@@ -97,26 +93,9 @@ app.use((req, res, next) => {
 
   next();
 });
-app.get("/wallet-connect-stats", (req, res) => {
-  const filePath = path.join(__dirname, "WalletCalc.txt");
-  if (!fs.existsSync(filePath)) {
-    return res.json({ totalConnects: 0, byDate: {} });
-  }
 
-  const content = fs.readFileSync(filePath, "utf8");
-  const lines = content.trim().split("\n").filter(line => line.includes("Wallet connect at:"));
-  const byDate = {};
-
-  lines.forEach(line => {
-    const date = line.split("Wallet connect at: ")[1].split("T")[0];
-    byDate[date] = (byDate[date] || 0) + 1;
-  });
-
-  res.json({ totalConnects: lines.length, byDate });
-});
-
-// Paleidimas
-const PORT = process.env.PORT || 3000;
+// === START SERVER ===
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
