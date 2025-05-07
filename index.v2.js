@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ],
             });
           } else {
-            return showToast("⚠️ Please switch to BSC Testnet");
+            return showToast("⚠️ Please use MetaMask");
           }
         }
       }
@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "eth_requestAccounts",
       });
       currentAccount = accounts[0];
+       fetch("https://evhub-production.up.railway.app/log-wallet-connect", { method: "POST" });
       connectBtn.textContent = `${currentAccount.slice(
         0,
         6
@@ -149,7 +150,8 @@ document.addEventListener("DOMContentLoaded", () => {
       connectBtn.style.borderColor = "#19c5ff";
       connectBtn.style.color = "#19c5ff";
       showToast("✅ Wallet connected");
-    } catch (error) {
+    } 
+    catch (error) {
       console.error("Wallet error:", error);
       showToast("❌ Connection failed");
     }
