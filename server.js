@@ -127,6 +127,12 @@ app.get("/api/address", (req, res) => {
   res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
 });
 
+app.post("/log-wallet-connect", (req, res) => {
+  const date = new Date().toISOString().split("T")[0];
+  walletConnectLog.push(date);
+  res.sendStatus(200);
+});
+
 app.get("/wallet-connect-stats", (req, res) => {
   const dailyCounts = walletConnectLog.reduce((acc, date) => {
     acc[date] = (acc[date] || 0) + 1;
