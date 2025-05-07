@@ -41,7 +41,13 @@ app.get("/buyers", (req, res) => {
       console.error("❌ Failed to read buyers file:", err);
       return res.status(500).send("Could not read buyers file");
     }
-    res.send(data);
+    const formatted = data
+  .trim()
+  .split("\n")
+  .map(line => `<div>${line}</div>`)
+  .join("");
+
+res.send(formatted);
   });
 });
 
