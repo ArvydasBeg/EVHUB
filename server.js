@@ -5,8 +5,21 @@ const cors = require("cors");
 const path = require("path");
 const app = express();
 
+
+
 app.use(cors());
 let walletConnectLog = [];
+// wallet stebejimui gauti 
+app.post("/log-wallet-connect", (req, res) => {
+  const date = new Date().toISOString();
+  const logLine = `Wallet connect at: ${date}\n`;
+
+  fs.appendFileSync("WalletCalc.txt", logLine);
+  console.log("✅ Logged to WalletCalc.txt:", logLine.trim());
+
+  res.sendStatus(200);
+});
+
 
 // Block suspicious bot-like paths
 app.use((req, res, next) => {
