@@ -3,6 +3,7 @@ const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
+let walletConnectLog = [];
 
 const app = express();
 // Block suspicious bot-like paths
@@ -122,4 +123,15 @@ app.get("/buyers.txt", (req, res) => {
 
 app.get("/api/address", (req, res) => {
   res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
+});
+
+app.get("/wallet-connect-stats", (req, res) => {
+  const dailyCounts = walletConnectLog.reduce((acc, date) => {
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {});
+  res.json({
+    totalConnects: walletConnectLog.length,
+    byDate: dailyCounts
+  });
 });
