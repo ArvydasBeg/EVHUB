@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-const PASSWORD = "visiemsEVHUB";
+
 
 // === BUYERS ===
 app.post("/api/save", (req, res) => {
@@ -30,8 +30,12 @@ app.post("/api/save", (req, res) => {
 });
 
 app.get("/buyers.txt", (req, res) => {
-  const password = req.query.password;
-  if (password !== PASSWORD) return res.status(403).send("Forbidden");
+  const filePath = path.join(__dirname, "buyers.txt");
+  if (!fs.existsSync(filePath)) return res.status(404).send("buyers.txt not found");
+
+  res.sendFile(filePath);
+});
+
 
   const filePath = path.join(__dirname, "buyers.txt");
   if (!fs.existsSync(filePath)) return res.status(404).send("buyers.txt not found");
