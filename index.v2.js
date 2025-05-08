@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tokenPrice = 0.0002;
   const hardCap = 16000000;
   let totalRaised = 0;
+  fetchExchangeRates(); 
 
   const amountInput = document.getElementById("amount");
   const tokenOutput = document.getElementById("token-output");
