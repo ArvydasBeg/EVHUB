@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const capNotice = document.getElementById("hardcap-reached");
 
   let currentAccount = null;
-  let exchangeRates = { ETH: 0, BNB: 0, USDC: 1 };
+  
   let recipientAddress = "";
   
   fetch("https://evhub-production.up.railway.app/api/address")
