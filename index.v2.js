@@ -167,64 +167,75 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("❌ Connection failed");
     }
   }
+buyButton.addEventListener("click", async () => {
+  const amount = parseFloat(amountInput.value);
+  const currency = currencySelect.value;
 
-  buyButton.addEventListener("click", async () => {
-    const amount = parseFloat(amountInput.value);
-    const currency = currencySelect.value;
+  if (!window.ethereum || !currentAccount) {
+    return showToast("⚠️ Please connect wallet first");
+  }
 
-    if (!window.ethereum || !currentAccount)
-      return showToast("⚠️ Please connect wallet first");
-    if (isNaN(amount) || amount <= 0 || !exchangeRates[currency])
-      return showToast("⚠️ Enter valid amount");
+  if (isNaN(amount) || amount <= 0) {
+    return showToast("⚠️ Enter valid amount");
+  }
 
-    const usd = amount * exchangeRates[currency];
-    if (usd < 1) return showToast("⚠️ Minimum contribution is $50");
+  if (!exchangeRates[currency]) {
+    return showToast("❌ Currency rate not available");
+  }
 
-    try {
-      showToast("⏳ Waiting for confirmation...");
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      if (!recipientAddress) {
-  return showToast("⚠️ Wallet address not loaded.");
-}
-      if (!recipientAddress || recipientAddress === "") {
-  console.error("❌ No recipient address loaded");
-  return showToast("⚠️ Wallet address not loaded");
-}
-      const tx = await signer.sendTransaction({
-        to: recipientAddress,
-        value: ethers.utils.parseEther(amount.toString()),
-      });
+  const usd = parseFloat((amount * exchangeRates[currency]).toFixed(2));
+  console.log("💰 USD value:", usd);
 
-      const usd = amount * exchangeRates[currency];
-      totalRaised += usd;
-      updateProgress();
-      amountInput.value = "";
-      tokenOutput.textContent = "0 tokens";
-      usdDisplay.textContent = "≈ $0.00";
-      showToast("🎉 Purchase sent!");
+  if (usd < 50) {
+    return showToast("⚠️ Minimum contribution is $50");
+  }
 
-      await fetch("https://evhub-production.up.railway.app/buy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wallet: currentAccount,
-          amount: usd.toFixed(2),
-        }),
-      });
+  try {
+    showToast("⏳ Waiting for confirmation...");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
 
-      await fetch("https://evhub-production.up.railway.app/update-raised", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: usd }),
-      });
-    } catch (err) {
-      console.error("TX Error:", err);
-      showToast(
-        err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
-      );
-    }
-  });
+    const tx = await signer.sendTransaction({
+      to: recipientAddress,
+      value: ethers.utils.parseEther(amount.toString()),
+    });
+
+    showToast("✅ Transaction sent! Awaiting receipt...");
+    await tx.wait();
+
+    showToast("✅ Transaction confirmed!");
+
+    totalRaised += usd;
+    updateProgress();
+    amountInput.value = "";
+    tokenOutput.textContent = "0 tokens";
+    usdDisplay.textContent = "≈ $0.00";
+    showToast("🎉 Purchase sent!");
+
+    await fetch("https://evhub-production.up.railway.app/buy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        wallet: currentAccount,
+        amount: usd.toFixed(2),
+      }),
+    });
+
+    await fetch("https://evhub-production.up.railway.app/update-raised", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: usd }),
+    });
+
+    loadLeaderboard();
+  } catch (err) {
+    console.error("TX Error:", err);
+    showToast(
+      err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
+    );
+  }
+});
+
 
   connectBtn.addEventListener("click", (e) => {
     e.preventDefault();
