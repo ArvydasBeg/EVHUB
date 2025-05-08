@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const hardCap = 16000000;
   let totalRaised = 0;
   fetchExchangeRates(); 
+  console.log("✅ Rates loaded:", exchangeRates);
+
 
   const amountInput = document.getElementById("amount");
   const tokenOutput = document.getElementById("token-output");
@@ -167,6 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("❌ Connection failed");
     }
   }
+  
 buyButton.addEventListener("click", async () => {
   const amount = parseFloat(amountInput.value);
   const currency = currencySelect.value;
@@ -237,6 +240,37 @@ buyButton.addEventListener("click", async () => {
 });
 
 
+
+      const usd = amount * exchangeRates[currency];
+      totalRaised += usd;
+      updateProgress();
+      amountInput.value = "";
+      tokenOutput.textContent = "0 tokens";
+      usdDisplay.textContent = "≈ $0.00";
+      showToast("🎉 Purchase sent!");
+
+      await fetch("https://evhub-production.up.railway.app/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wallet: currentAccount,
+          amount: usd.toFixed(2),
+        }),
+      });
+
+      await fetch("https://evhub-production.up.railway.app/update-raised", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: usd }),
+      });
+    } catch (err) {
+      console.error("TX Error:", err);
+      showToast(
+        err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
+      );
+    }
+  });
+
   connectBtn.addEventListener("click", (e) => {
     e.preventDefault();
     connectWallet();
@@ -250,18 +284,11 @@ buyButton.addEventListener("click", async () => {
   loadLeaderboard();
   setInterval(loadLeaderboard, 10000);
 
-fetch("https://evhub-production.up.railway.app/api/address")
+    fetch("https://evhub-production.up.railway.app/api/address")
   .then((res) => res.json())
   .then((data) => {
     recipientAddress = data.address;
-    console.log("✅ Address loaded:", recipientAddress);
-  })
-  .catch((err) => {
-    console.error("❌ Failed to load address", err);
-    showToast("❌ Failed to load wallet address");
-  });
-
-  });
+  });;
 });
 //
 //
