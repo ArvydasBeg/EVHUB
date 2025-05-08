@@ -185,13 +185,15 @@ buyButton.addEventListener("click", async () => {
   if (!exchangeRates[currency]) {
     return showToast("❌ Currency rate not available");
   }
+  
+const usd = parseFloat((amount * exchangeRates[currency]).toFixed(2));
+console.log("💸 USD converted amount:", usd);
 
-  const usd = parseFloat((amount * exchangeRates[currency]).toFixed(2));
-  console.log("💰 USD value:", usd);
+if (usd < 50) {
+  console.log("❗ Below minimum");
+  return showToast("⚠️ Minimum contribution is $50");
+}
 
-  if (usd < 50) {
-    return showToast("⚠️ Minimum contribution is $50");
-  }
 
   try {
     showToast("⏳ Waiting for confirmation...");
