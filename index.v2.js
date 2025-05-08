@@ -18,6 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAccount = null;
   let exchangeRates = { ETH: 0, BNB: 0, USDC: 1 };
   let recipientAddress = "";
+  
+  fetch("https://evhub-production.up.railway.app/api/address")
+  .then((res) => res.json())
+  .then((data) => {
+    recipientAddress = data.address;
+    console.log("✅ Address loaded:", recipientAddress);
+  })
+  .catch((err) => {
+    console.error("❌ Failed to load address", err);
+    showToast("❌ Failed to load wallet address");
+  });
+
 
   async function fetchExchangeRates() {
     try {
