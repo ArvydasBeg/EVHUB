@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return showToast("⚠️ Enter valid amount");
 
     const usd = amount * exchangeRates[currency];
-    if (usd < 50) return showToast("⚠️ Minimum contribution is $50");
+    if (usd < 1) return showToast("⚠️ Minimum contribution is $50");
 
     try {
       showToast("⏳ Waiting for confirmation...");
