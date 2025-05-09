@@ -1,10 +1,10 @@
-// index.v2.js - Sutvarkyta versija
+// index.v2.js - Atnaujinta su recipientAddress įkėlimu
 
 // Paleidžiam po DOM užkrovimo
 document.addEventListener("DOMContentLoaded", () => {
   const tokenPrice = 0.0002;
   const hardCap = 16000000;
-  const MINIMUM_USD = 1; // <- minimumas
+  const MINIMUM_USD = 50; // <- minimumas
 
   let totalRaised = 0;
   let currentAccount = null;
@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const usd = amount * exchangeRates[currency];
     if (usd < MINIMUM_USD) return showToast(`⚠️ Minimum contribution is $${MINIMUM_USD}`);
+
+    if (!recipientAddress) return showToast("❌ Payment address not loaded yet");
 
     try {
       showToast("⏳ Waiting for confirmation...");
@@ -137,6 +139,18 @@ document.addEventListener("DOMContentLoaded", () => {
       updateTokenOutput();
     } catch (err) {
       console.error("Failed to fetch exchange rates:", err);
+    }
+  }
+
+  async function loadRecipientAddress() {
+    try {
+      const res = await fetch("/api/address");
+      const data = await res.json();
+      recipientAddress = data.address;
+      console.log("✅ Recipient address loaded:", recipientAddress);
+    } catch (err) {
+      console.error("❌ Failed to load recipient address:", err);
+      showToast("❌ Could not load payment address");
     }
   }
 
@@ -244,13 +258,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   fetchExchangeRates();
+  loadRecipientAddress();
   loadTotalRaised();
   loadLeaderboard();
   setInterval(loadLeaderboard, 10000);
-
-  fetch("/api/address")
-    .then((res) => res.json())
-    .then((data) => {
-      recipientAddress = data.address;
-    });
 });
