@@ -4,6 +4,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const tokenPrice = 0.0002;
   const hardCap = 16000000;
+  const MINIMUM_USD = 1; // <- minimumas
+
   let totalRaised = 0;
   let currentAccount = null;
   let recipientAddress = "";
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return showToast("⚠️ Enter valid amount");
 
     const usd = amount * exchangeRates[currency];
-    if (usd < 50) return showToast("⚠️ Minimum contribution is $50");
+    if (usd < MINIMUM_USD) return showToast(`⚠️ Minimum contribution is $${MINIMUM_USD}`);
 
     try {
       showToast("⏳ Waiting for confirmation...");
