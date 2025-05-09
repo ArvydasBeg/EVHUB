@@ -1,14 +1,12 @@
+// index.v2.js - Sutvarkyta versija
+
+// Paleidžiam po DOM užkrovimo
 document.addEventListener("DOMContentLoaded", () => {
   const tokenPrice = 0.0002;
   const hardCap = 16000000;
   let totalRaised = 0;
-  fetchExchangeRates(); 
-  console.log("✅ Rates loaded:", exchangeRates);
-   const connectBtn = document.querySelector(".connect_wallet_button");
-  connectBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    connectWallet();
-
+  let currentAccount = null;
+  let recipientAddress = "";
 
   const amountInput = document.getElementById("amount");
   const tokenOutput = document.getElementById("token-output");
@@ -22,27 +20,114 @@ document.addEventListener("DOMContentLoaded", () => {
   const liveRemaining = document.getElementById("live-remaining");
   const capNotice = document.getElementById("hardcap-reached");
 
-  let currentAccount = null;
-  
-  let recipientAddress = "";
-  
-  fetch("https://evhub-production.up.railway.app/api/address")
-  .then((res) => res.json())
-  .then((data) => {
-    recipientAddress = data.address;
-    console.log("✅ Address loaded:", recipientAddress);
-  })
-  .catch((err) => {
-    console.error("❌ Failed to load address", err);
-    showToast("❌ Failed to load wallet address");
+  let exchangeRates = { ETH: 0, BNB: 0, USDC: 1 };
+
+  connectBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    connectWallet();
   });
 
+  buyButton.addEventListener("click", async () => {
+    const amount = parseFloat(amountInput.value);
+    const currency = currencySelect.value;
+
+    if (!window.ethereum || !currentAccount)
+      return showToast("⚠️ Please connect wallet first");
+
+    if (isNaN(amount) || amount <= 0 || !exchangeRates[currency])
+      return showToast("⚠️ Enter valid amount");
+
+    const usd = amount * exchangeRates[currency];
+    if (usd < 50) return showToast("⚠️ Minimum contribution is $50");
+
+    try {
+      showToast("⏳ Waiting for confirmation...");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const tx = await signer.sendTransaction({
+        to: recipientAddress,
+        value: ethers.utils.parseEther(amount.toString()),
+      });
+
+      await tx.wait();
+      showToast("✅ Transaction confirmed!");
+
+      totalRaised += usd;
+      updateProgress();
+      amountInput.value = "";
+      tokenOutput.textContent = "0 tokens";
+      usdDisplay.textContent = "≈ $0.00";
+
+      await fetch("/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: currentAccount, amount: usd.toFixed(2) }),
+      });
+
+      await fetch("/update-raised", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: usd }),
+      });
+
+      loadLeaderboard();
+    } catch (err) {
+      console.error("TX Error:", err);
+      showToast(
+        err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
+      );
+    }
+  });
+
+  amountInput.addEventListener("input", updateTokenOutput);
+  currencySelect.addEventListener("change", updateTokenOutput);
+
+  async function connectWallet() {
+    if (!window.ethereum) return showToast("⚠️ MetaMask not found");
+
+    const requiredChainId = "0x38"; // BSC Mainnet
+
+    try {
+      const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
+      if (currentChainId !== requiredChainId) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: requiredChainId }],
+          });
+        } catch (err) {
+          if (err.code === 4902) {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: requiredChainId,
+                chainName: "Binance Smart Chain",
+                rpcUrls: ["https://bsc-dataseed.binance.org"],
+                nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+                blockExplorerUrls: ["https://bscscan.com"],
+              }],
+            });
+          } else {
+            return showToast("⚠️ Please switch to BSC Mainnet manually");
+          }
+        }
+      }
+
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      currentAccount = accounts[0];
+      connectBtn.textContent = `${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+      connectBtn.style.borderColor = "#19c5ff";
+      connectBtn.style.color = "#19c5ff";
+      showToast("✅ Wallet connected");
+    } catch (error) {
+      console.error("Wallet error:", error);
+      showToast("❌ Connection failed");
+    }
+  }
 
   async function fetchExchangeRates() {
     try {
-      const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,binancecoin,usd-coin&vs_currencies=usd"
-      );
+      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum,binancecoin,usd-coin&vs_currencies=usd");
       const data = await res.json();
       exchangeRates.ETH = data.ethereum.usd;
       exchangeRates.BNB = data.binancecoin.usd;
@@ -55,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadTotalRaised() {
     try {
-      const res = await fetch("https://evhub-production.up.railway.app/raised");
+      const res = await fetch("/raised");
       const data = await res.json();
       totalRaised = data.raised || 0;
       updateProgress();
@@ -118,227 +203,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  async function connectWallet() {
-    if (!window.ethereum) return showToast("⚠️ MetaMask not found");
-
-    const requiredChainId = "0x38";
-
+  async function loadLeaderboard() {
     try {
-      const currentChainId = await window.ethereum.request({
-        method: "eth_chainId",
-      });
-      if (currentChainId !== requiredChainId) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: requiredChainId }],
-          });
-        } catch (err) {
-          if (err.code === 4902) {
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  chainId: requiredChainId,
-                  chainName: "Binance Smart Chain",
-                  rpcUrls: ["https://bsc-dataseed.binance.org"],
-                  nativeCurrency: {
-                    name: "BNB",
-                    symbol: "BNB",
-                    decimals: 18,
-                  },
-                  blockExplorerUrls: ["https://bscscan.com"],
-                },
-              ],
-            });
-          } else {
-            return showToast("⚠️ Please switch to BSC Testnet");
-          }
+      const res = await fetch("/buyers");
+      const text = await res.text();
+
+      const rows = text.trim().split("\n");
+      const list = document.getElementById("leaderboard-list");
+      list.innerHTML = "";
+
+      const parsed = rows
+        .map((row) => {
+          const [wallet, amount] = row.split(" | ");
+          return {
+            wallet: wallet.trim(),
+            amount: parseFloat(amount),
+          };
+        })
+        .reverse()
+        .slice(0, 7);
+
+      parsed.forEach((entry, index) => {
+        const li = document.createElement("li");
+        const short = `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`;
+        li.innerHTML = `<div>${short}</div><span>$${entry.amount.toFixed(2)}</span>`;
+
+        if (index === 0 && entry.wallet !== lastTopWallet) {
+          li.classList.add("new-entry");
+          setTimeout(() => li.classList.remove("new-entry"), 2000);
+          lastTopWallet = entry.wallet;
         }
-      }
 
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      currentAccount = accounts[0];
-      connectBtn.textContent = `${currentAccount.slice(
-        0,
-        6
-      )}...${currentAccount.slice(-4)}`;
-      connectBtn.style.borderColor = "#19c5ff";
-      connectBtn.style.color = "#19c5ff";
-      showToast("✅ Wallet connected");
-    } catch (error) {
-      console.error("Wallet error:", error);
-      showToast("❌ Connection failed");
-    }
-  }
-  
-buyButton.addEventListener("click", async () => {
-  const amount = parseFloat(amountInput.value);
-  const currency = currencySelect.value;
-
-  if (!window.ethereum || !currentAccount) {
-    return showToast("⚠️ Please connect wallet first");
-  }
-
-  if (isNaN(amount) || amount <= 0) {
-    return showToast("⚠️ Enter valid amount");
-  }
-
-  if (!exchangeRates[currency]) {
-    return showToast("❌ Currency rate not available");
-  }
-  
-const usd = parseFloat((amount * exchangeRates[currency]).toFixed(2));
-console.log("💸 USD converted amount:", usd);
-
-if (usd < 50) {
-  console.log("❗ Below minimum");
-  return showToast("⚠️ Minimum contribution is $50");
-}
-
-
-  try {
-    showToast("⏳ Waiting for confirmation...");
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-
-    const tx = await signer.sendTransaction({
-      to: recipientAddress,
-      value: ethers.utils.parseEther(amount.toString()),
-    });
-
-    showToast("✅ Transaction sent! Awaiting receipt...");
-    await tx.wait();
-
-    showToast("✅ Transaction confirmed!");
-
-    totalRaised += usd;
-    updateProgress();
-    amountInput.value = "";
-    tokenOutput.textContent = "0 tokens";
-    usdDisplay.textContent = "≈ $0.00";
-    showToast("🎉 Purchase sent!");
-
-    await fetch("https://evhub-production.up.railway.app/buy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        wallet: currentAccount,
-        amount: usd.toFixed(2),
-      }),
-    });
-
-    await fetch("https://evhub-production.up.railway.app/update-raised", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: usd }),
-    });
-
-    loadLeaderboard();
-  } catch (err) {
-    console.error("TX Error:", err);
-    showToast(
-      err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
-    );
-  }
-});
-
-
-
-      const usd = amount * exchangeRates[currency];
-      totalRaised += usd;
-      updateProgress();
-      amountInput.value = "";
-      tokenOutput.textContent = "0 tokens";
-      usdDisplay.textContent = "≈ $0.00";
-      showToast("🎉 Purchase sent!");
-
-      await fetch("https://evhub-production.up.railway.app/buy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          wallet: currentAccount,
-          amount: usd.toFixed(2),
-        }),
-      });
-
-      await fetch("https://evhub-production.up.railway.app/update-raised", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: usd }),
+        list.appendChild(li);
       });
     } catch (err) {
-      console.error("TX Error:", err);
-      showToast(
-        err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
-      );
+      console.error("❌ Failed to load leaderboard:", err);
     }
-  });
-
-  connectBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    connectWallet();
-  });
-
-  amountInput.addEventListener("input", updateTokenOutput);
-  currencySelect.addEventListener("change", updateTokenOutput);
+  }
 
   fetchExchangeRates();
   loadTotalRaised();
   loadLeaderboard();
   setInterval(loadLeaderboard, 10000);
 
-    fetch("https://evhub-production.up.railway.app/api/address")
-  .then((res) => res.json())
-  .then((data) => {
-    recipientAddress = data.address;
-  });;
-});
-//
-//
-//
-//
-// ============Leaderboardas
-let lastTopWallet = null; // išorėje virš funkcijos
-async function loadLeaderboard() {
-  try {
-    const res = await fetch("https://evhub-production.up.railway.app/buyers");
-    const text = await res.text();
-
-    const rows = text.trim().split("\n");
-    const list = document.getElementById("leaderboard-list");
-    list.innerHTML = "";
-
-    const parsed = rows
-      .map((row) => {
-        const [wallet, amount] = row.split(" | ");
-        return {
-          wallet: wallet.trim(),
-          amount: parseFloat(amount),
-        };
-      })
-      .reverse()
-      .slice(0, 7);
-
-    parsed.forEach((entry, index) => {
-      const li = document.createElement("li");
-      const short = `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`;
-      li.innerHTML = `<div>${short}</div><span>$${entry.amount.toFixed(
-        2
-      )}</span>`;
-
-      // Tik jei šis yra naujas viršutinis įrašas — priskiriam animaciją
-      if (index === 0 && entry.wallet !== lastTopWallet) {
-        li.classList.add("new-entry");
-        setTimeout(() => li.classList.remove("new-entry"), 2000);
-        lastTopWallet = entry.wallet; // atnaujinam
-      }
-
-      list.appendChild(li);
+  fetch("/api/address")
+    .then((res) => res.json())
+    .then((data) => {
+      recipientAddress = data.address;
     });
-  } catch (err) {
-    console.error("❌ Failed to load leaderboard:", err);
-  }
-}
+});
