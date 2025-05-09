@@ -62,13 +62,13 @@ document.addEventListener("DOMContentLoaded", () => {
       tokenOutput.textContent = "0 tokens";
       usdDisplay.textContent = "≈ $0.00";
 
-      await fetch("/buy", {
+      await fetch("https://evhub-production.up.railway.app/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wallet: currentAccount, amount: usd.toFixed(2) }),
       });
 
-      await fetch("/update-raised", {
+      await fetch("https://evhub-production.up.railway.app/update-raised", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: usd }),
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadRecipientAddress() {
     try {
-      const res = await fetch("/api/address");
+      const res = await fetch("https://evhub-production.up.railway.app/api/address");
       const data = await res.json();
       recipientAddress = data.address;
       console.log("✅ Recipient address loaded:", recipientAddress);
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadTotalRaised() {
     try {
-      const res = await fetch("/raised");
+      const res = await fetch("https://evhub-production.up.railway.app/raised");
       const data = await res.json();
       totalRaised = data.raised || 0;
       updateProgress();
@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadLeaderboard() {
     try {
-      const res = await fetch("/buyers");
+      const res = await fetch("https://evhub-production.up.railway.app/buyers");
       const text = await res.text();
 
       const rows = text.trim().split("\n");
