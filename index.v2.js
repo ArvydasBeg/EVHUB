@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let totalRaised = 0;
   fetchExchangeRates(); 
   console.log("✅ Rates loaded:", exchangeRates);
+   const connectBtn = document.querySelector(".connect_wallet_button");
+  connectBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    connectWallet();
 
 
   const amountInput = document.getElementById("amount");
