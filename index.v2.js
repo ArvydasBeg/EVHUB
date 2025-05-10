@@ -2,9 +2,10 @@
 
 // Paleidžiam po DOM užkrovimo
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ JS loaded and DOM fully parsed");
   const tokenPrice = 0.0002;
   const hardCap = 16000000;
-  const MINIMUM_USD = 50; // <- minimumas
+  const MINIMUM_USD = 1; // <- minimumas
 
   let totalRaised = 0;
   let currentAccount = null;
@@ -29,25 +30,33 @@ document.addEventListener("DOMContentLoaded", () => {
     connectWallet();
   });
 
+  // ✅ ATNAUJINTA: vienas aiškus try/catch be pasikartojimų
   buyButton.addEventListener("click", async () => {
     const amount = parseFloat(amountInput.value);
     const currency = currencySelect.value;
 
-    if (!window.ethereum || !currentAccount)
+    if (!window.ethereum || !currentAccount) {
       return showToast("⚠️ Please connect wallet first");
+    }
 
-    if (isNaN(amount) || amount <= 0 || !exchangeRates[currency])
+    if (isNaN(amount) || amount <= 0 || !exchangeRates[currency]) {
       return showToast("⚠️ Enter valid amount");
+    }
 
     const usd = amount * exchangeRates[currency];
-    if (usd < MINIMUM_USD) return showToast(`⚠️ Minimum contribution is $${MINIMUM_USD}`);
+    if (usd < MINIMUM_USD) {
+      return showToast(`⚠️ Minimum contribution is $${MINIMUM_USD}`);
+    }
 
-    if (!recipientAddress) return showToast("❌ Payment address not loaded yet");
+    if (!recipientAddress) {
+      return showToast("❌ Payment address not loaded yet");
+    }
 
     try {
       showToast("⏳ Waiting for confirmation...");
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
+
       const tx = await signer.sendTransaction({
         to: recipientAddress,
         value: ethers.utils.parseEther(amount.toString()),
@@ -77,9 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
       loadLeaderboard();
     } catch (err) {
       console.error("TX Error:", err);
-      showToast(
-        err.code === 4001 ? "❌ Transaction rejected" : "⚠️ Transaction failed"
-      );
+      if (err.code === 4001) {
+        showToast("❌ Transaction rejected by user");
+      } else {
+        showToast("⚠️ Transaction failed. Please check MetaMask and try again.");
+      }
     }
   });
 
@@ -87,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   currencySelect.addEventListener("change", updateTokenOutput);
 
   async function connectWallet() {
+    console.log("🟢 connectWallet called");
     if (!window.ethereum) return showToast("⚠️ MetaMask not found");
 
     const requiredChainId = "0x38"; // BSC Mainnet
