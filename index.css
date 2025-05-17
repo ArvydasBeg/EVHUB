@@ -689,3 +689,50 @@ select {
 .toast.hidden {
   display: none;
 }
+
+/* contact us */
+
+.contact {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: transparent;
+  color: #ffffff;
+  gap: 150px;
+}
+
+.contact h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.contact p {
+  font-size: 1rem;
+  color: #a0aec0;
+  margin-bottom: 1.5rem;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 400px;
+  text-align: end;
+}
+
+.contact-list li {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.contact-list a {
+  color: #4cc2ff;
+  text-decoration: none;
+}
+
+.contact-list a:hover {
+  text-decoration: underline;
+}
