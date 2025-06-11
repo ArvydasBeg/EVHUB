@@ -57,12 +57,32 @@ document.addEventListener("DOMContentLoaded", () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
 
-      const tx = await signer.sendTransaction({
-        to: recipientAddress,
-        value: ethers.utils.parseEther(amount.toString()),
-      });
+      if (currency === "BNB") {
+        // Native BNB pavedimas
+        const tx = await signer.sendTransaction({
+          to: recipientAddress,
+          value: ethers.utils.parseEther(amount.toString()),
+        });
+        await tx.wait();
+      } else if (currency === "USDC") {
+        // USDC (BEP-20) pavedimas
+        const USDC_ADDRESS = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d";
+        const ERC20_ABI = [
+          "function transfer(address to, uint256 value) public returns (bool)",
+        ];
+        const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
+        // Dauguma BSC USDC turi 18 decimalų. Jei sumą rodo keistai – pabandyk pakeisti į 6.
+        const decimals = 18;
+        const amountInWei = ethers.utils.parseUnits(
+          amount.toString(),
+          decimals
+        );
+        const tx = await usdc.transfer(recipientAddress, amountInWei);
+        await tx.wait();
+      } else {
+        return showToast("❌ Only BNB or USDC supported");
+      }
 
-      await tx.wait();
       showToast("✅ Transaction confirmed!");
 
       totalRaised += usd;
@@ -86,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ amount: usd }),
       });
 
-      loadLeaderboard();
+      // loadLeaderboard();
     } catch (err) {
       console.error("TX Error:", err);
       if (err.code === 4001) {
