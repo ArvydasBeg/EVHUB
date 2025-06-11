@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
         // Dauguma BSC USDC turi 18 decimalų. Jei sumą rodo keistai – pabandyk pakeisti į 6.
-        const decimals = 18;
+        const decimals = 6;
         const amountInWei = ethers.utils.parseUnits(
           amount.toString(),
           decimals
