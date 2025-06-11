@@ -1,11 +1,12 @@
 // index.v2.js - Atnaujinta su recipientAddress įkėlimu
 
-// Paleidžiam po DOM užkrovimo
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ JS loaded and DOM fully parsed");
   const tokenPrice = 0.0002;
   const hardCap = 1600000;
   const MINIMUM_USD = 1; // <- minimumas
+  const claimBtn = document.querySelector(".claim-btn");
+  const API_URL = "https://evhub-production.up.railway.app";
 
   let totalRaised = 0;
   let currentAccount = null;
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     connectWallet();
   });
 
-  // ✅ ATNAUJINTA: vienas aiškus try/catch be pasikartojimų
+  // Presale logic...
   buyButton.addEventListener("click", async () => {
     const amount = parseFloat(amountInput.value);
     const currency = currencySelect.value;
@@ -72,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, signer);
         // Dauguma BSC USDC turi 18 decimalų. Jei sumą rodo keistai – pabandyk pakeisti į 6.
-        const decimals = 6;
+        const decimals = 18;
         const amountInWei = ethers.utils.parseUnits(
           amount.toString(),
           decimals
@@ -91,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tokenOutput.textContent = "0 tokens";
       usdDisplay.textContent = "≈ $0.00";
 
-      await fetch("https://evhub-production.up.railway.app/buy", {
+      await fetch(`${API_URL}/buy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -100,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
 
-      await fetch("https://evhub-production.up.railway.app/update-raised", {
+      await fetch(`${API_URL}/update-raised`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: usd }),
@@ -109,8 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // loadLeaderboard();
     } catch (err) {
       console.error("TX Error:", err);
-      console.dir(err); // <-- PRIDĖK ŠITĄ!
-      alert(JSON.stringify(err)); // <-- PRIDĖK šitam kartui, kad matytum pilną klaidą
       if (err.code === 4001) {
         showToast("❌ Transaction rejected by user");
       } else {
@@ -171,6 +170,10 @@ document.addEventListener("DOMContentLoaded", () => {
       connectBtn.style.borderColor = "#19c5ff";
       connectBtn.style.color = "#19c5ff";
       showToast("✅ Wallet connected");
+
+      // AIRDROP: Connect wallet ir atvaizduok airdrop dashboard
+      await airdropOnConnect(currentAccount);
+      document.querySelector(".airdrop-dashboard").classList.add("expanded");
     } catch (error) {
       console.error("Wallet error:", error);
       showToast("❌ Connection failed");
@@ -194,9 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadRecipientAddress() {
     try {
-      const res = await fetch(
-        "https://evhub-production.up.railway.app/api/address"
-      );
+      const res = await fetch(`${API_URL}/api/address`);
       const data = await res.json();
       recipientAddress = data.address;
       console.log("✅ Recipient address loaded:", recipientAddress);
@@ -208,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadTotalRaised() {
     try {
-      const res = await fetch("https://evhub-production.up.railway.app/raised");
+      const res = await fetch(`${API_URL}/raised`);
       const data = await res.json();
       totalRaised = data.raised || 0;
       updateProgress();
@@ -271,49 +272,184 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  async function loadLeaderboard() {
-    try {
-      const res = await fetch("https://evhub-production.up.railway.app/buyers");
-      const text = await res.text();
-
-      const rows = text.trim().split("\n");
-      const list = document.getElementById("leaderboard-list");
-      list.innerHTML = "";
-
-      const parsed = rows
-        .map((row) => {
-          const [wallet, amount] = row.split(" | ");
-          return {
-            wallet: wallet.trim(),
-            amount: parseFloat(amount),
-          };
-        })
-        .reverse()
-        .slice(0, 7);
-
-      parsed.forEach((entry, index) => {
-        const li = document.createElement("li");
-        const short = `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`;
-        li.innerHTML = `<div>${short}</div><span>$${entry.amount.toFixed(
-          2
-        )}</span>`;
-
-        if (index === 0 && entry.wallet !== lastTopWallet) {
-          li.classList.add("new-entry");
-          setTimeout(() => li.classList.remove("new-entry"), 2000);
-          lastTopWallet = entry.wallet;
-        }
-
-        list.appendChild(li);
-      });
-    } catch (err) {
-      console.error("❌ Failed to load leaderboard:", err);
-    }
-  }
-
   fetchExchangeRates();
   loadRecipientAddress();
   loadTotalRaised();
-  loadLeaderboard();
-  setInterval(loadLeaderboard, 10000);
+
+  // ========================
+  // ==== AIRDROP ZONA ======
+  // ========================
+
+  // UI elementai
+  const airdropCodeInput = document.getElementById("user-code");
+  const airdropLinkInput = document.getElementById("invite-link");
+  const friendCodeInput = document.getElementById("friend-code");
+  const airdropSubmitBtn = document.querySelector(".submit-btn");
+  const airdropDetails = document.querySelector(".details");
+  const friendStatus = document.getElementById("friend-status");
+
+  // Register wallet and get/generate code
+  async function airdropOnConnect(wallet) {
+    if (!wallet) return;
+    // Užregistruoti ar gauti kodą
+    const res = await fetch(
+      "http://localhost:3000/api/airdrop/register-wallet",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet }),
+      }
+    );
+    const data = await res.json();
+    if (airdropCodeInput) airdropCodeInput.value = data.code;
+    if (airdropLinkInput)
+      airdropLinkInput.value = `https://evhub.space/invite/${data.code}`;
+    // Autofill draugo kodą jei atėjai su /invite/ kodu
+    const match = window.location.pathname.match(/^\/invite\/(evhub\d{5})/);
+    if (match && friendCodeInput) friendCodeInput.value = match[1];
+    await updateAirdropStats(wallet);
+  }
+
+  // Pakviestų žmonių atvaizdavimas
+  async function updateAirdropStats(wallet) {
+    if (!wallet) return;
+    const res = await fetch(
+      `http://localhost:3000/api/airdrop/wallet-stats/${wallet}`
+    );
+    const data = await res.json(); // Patikrinam ar buvo claim
+    if (data.claimed && data.claimInfo) {
+      // Čia atvaizduojam kiek gavo claim metu
+      airdropDetails.innerHTML = `
+      <div>
+        <b>You already claimed:</b><br>
+        Base: <span>${data.claimInfo.base.toLocaleString()}</span> EVHUB<br>
+        Presale bonus: <span>${data.claimInfo.presaleBonus.toLocaleString()}</span> EVHUB<br>
+        Friend reward: <span>${data.claimInfo.friendReward.toLocaleString()}</span> EVHUB<br>
+        <b>Total claimed: <span>${data.claimInfo.total.toLocaleString()} EVHUB</span></b>
+      </div>
+      <div>
+        <b>You have invited: <span>${
+          data.invitedAtClaim
+        }</span> (at claim time)</b>
+      </div>
+      <div>
+        ${
+          data.presaleAtClaim
+            ? "+25,000 bonus received for having presale"
+            : "No presale bonus at claim"
+        }
+      </div>
+      <div>
+        <b>New invites after claim:</b> 
+        <span>${data.invited - data.invitedAtClaim || 0}</span>
+        <br>
+        ${
+          data.presaleAtClaim
+            ? "Now you get +1,000 EVHUB per friend after claim"
+            : "Now you get +100 EVHUB per friend (or +500 if do presale after claim)"
+        }
+      </div>
+    `;
+      // Disable claim mygtuką po claim
+      if (claimBtn) claimBtn.disabled = true;
+      return;
+    }
+
+    // Jei dar neclaimino – skaičiuojam total
+    // Tikrinam presale (fetch buyers)
+    let hasPresale = false;
+    try {
+      const buyersRes = await fetch(`${API_URL}/buyers`);
+      const buyersText = await buyersRes.text();
+      hasPresale = buyersText.toLowerCase().includes(wallet.toLowerCase());
+    } catch (e) {}
+
+    const invitedCount = data.invited || 0;
+    let total = 50000;
+    if (hasPresale) total += 25000;
+    total += invitedCount * (hasPresale ? 1000 : 100);
+
+    airdropDetails.innerHTML = `
+    You will claim: <span class="claim-amount">50,000 EVHUB</span><br>
+    <span class="presale-bonus">+25,000 with presale</span><br>
+    Invite friends: <span>${
+      hasPresale ? "1,000" : "100"
+    } EVHUB per friend</span><br>
+    Presale: <span class="yes">${hasPresale ? "YES" : "NO"}</span><br>
+    You have invited: <span>${invitedCount}</span><br>
+    <div class="total-get"><b>Total get: ${total.toLocaleString()} EVHUB</b></div>
+  `;
+  }
+
+  // Draugo kodo submit eventas
+  if (airdropSubmitBtn) {
+    airdropSubmitBtn.addEventListener("click", async () => {
+      if (!currentAccount) {
+        await connectWallet();
+        // connectWallet iškvies airdropOnConnect automatiškai
+        return;
+      }
+      const friendCode = friendCodeInput.value.trim();
+      if (!friendCode) {
+        alert("Įvesk draugo kodą!");
+        return;
+      }
+      const res = await fetch(
+        "http://localhost:3000/api/airdrop/refer-wallet",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: currentAccount, friendCode }),
+        }
+      );
+      const data = await res.json();
+      if (data.ok) {
+        showToast("✅ Friend added!");
+        await updateAirdropStats(currentAccount);
+        friendCodeInput.disabled = true;
+        airdropSubmitBtn.disabled = true;
+      } else {
+        showToast("❌ " + (data.error || "Referral klaida."));
+      }
+    });
+  }
+
+  // Kodų copy funkcijos (nereikia keisti)
 });
+
+// Copy funkcijos (likusios nuo seno)
+function copyCode() {
+  const codeInput = document.getElementById("user-code");
+  codeInput.select();
+  document.execCommand("copy");
+}
+function copyLink() {
+  const linkInput = document.getElementById("invite-link");
+  linkInput.select();
+  document.execCommand("copy");
+}
+
+// airdropm claim
+
+if (claimBtn) {
+  claimBtn.addEventListener("click", async () => {
+    console.log("Claim mygtukas paspaustas!");
+    if (!currentAccount) {
+      showToast("Please connect wallet first");
+      return;
+    }
+    // Siunčiam claim request
+    const res = await fetch("http://localhost:3000/api/airdrop/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet: currentAccount }),
+    });
+    const data = await res.json();
+    if (data.claimed || data.alreadyClaimed) {
+      showToast("🎉 Claimed successfully!");
+      await updateAirdropStats(currentAccount); // atnaujina dashboard'ą
+    } else {
+      showToast("❌ Claim failed!");
+    }
+  });
+}
