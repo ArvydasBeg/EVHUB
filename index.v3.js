@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // loadLeaderboard();
     } catch (err) {
       console.error("TX Error:", err);
+      console.dir(err); // <-- PRIDĖK ŠITĄ!
+      alert(JSON.stringify(err)); // <-- PRIDĖK šitam kartui, kad matytum pilną klaidą
       if (err.code === 4001) {
         showToast("❌ Transaction rejected by user");
       } else {
