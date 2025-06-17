@@ -457,7 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
-
+console.log("🟢 Loading airdrop dashboard...");
 // Copy funkcijos (likusios nuo seno)
 function copyCode() {
   const codeInput = document.getElementById("user-code");
