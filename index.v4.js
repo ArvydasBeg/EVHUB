@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================
   // ==== AIRDROP ZONA ======
   // ========================
-
+  console.log("🟢 Loading airdrop dashboard...");
   // UI elementai
   const airdropCodeInput = document.getElementById("user-code");
   const airdropLinkInput = document.getElementById("invite-link");
