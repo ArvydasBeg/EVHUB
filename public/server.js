@@ -5,7 +5,7 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+console.log("STARTED WITH PORT:", process.env.PORT);
 // Saugus CORS
 app.use(
   cors({
