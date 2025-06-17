@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================
   // ==== AIRDROP ZONA ======
   // ========================
-  console.log("🟢 Loading airdrop dashboard...");
+
   // UI elementai
   const airdropCodeInput = document.getElementById("user-code");
   const airdropLinkInput = document.getElementById("invite-link");
@@ -457,7 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
-
+console.log("🟢 Loading airdrop dashboard...");
 // Copy funkcijos (likusios nuo seno)
 function copyCode() {
   const codeInput = document.getElementById("user-code");
