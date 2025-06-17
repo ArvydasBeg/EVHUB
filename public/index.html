@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+      integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+    <script src="./index.v4.js" defer></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;700&display=swap");
+    </style>
+    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="tablet.css" media="screen and (max-width: 770px)" />
+    <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 550px)" />
+    <link rel="stylesheet" href="mini_phone.css" media="screen and (max-width: 429px)" />
+
+    <script
+      src="https://kit.fontawesome.com/58c83ef9b9.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="/image/Ikona be fono.png" alt="EVHUB logo" />
+        <span>EVHUB</span>
+      </div>
+      <nav>
+        <!-- <a href="#roadmap">About</a> -->
+        <a href="#contact">Contact us</a>
+        <a href="#roadmap">Roadmap</a>
+        <a
+          href="https://www.notion.so/EVHUB-Whitepaper-1eb0f0e6508480c79e67fe9a440b92d0?pvs=4"
+          >Whitepaper</a
+        >
+        <!-- <a href="#presale">NFTs</a> -->
+        <a class="connect_wallet_button" href="#">Connect Wallet</a>
+      </nav>
+    </header>
+    <!-- about -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>BLOCKCHAIN-BASED<br />EV CHARGING<br />STATION NETWORK</h1>
+          <p>Be part of the future. Charge. Earn. Own.</p>
+          <a href="#airdrop-langas" class="button gradient">Airdrop is HERE</a>
+        </div>
+        <div class="hero-image">
+          <img src="/image/stotele be fono.png" alt="EV Charging Station" />
+        </div>
+      </div>
+    </section>
+     <!-- AIRDROP ir PRESALE -->
+     <!-- AIRDROPAS -->
+    <section class="card-section">
+
+      <!-- AIRDROPAS -->
+<div class="airdrop-dashboard expended" id="airdrop-langas" >
+  <h2>Welcome to your FUTURE</h2>
+  <div class="row">
+    <div>
+      <label>Your code</label>
+      <div class="input-copy-group">
+        <input type="text" value="Your code" id="user-code" readonly>
+        <button class="copy-btn" onclick="copyCode()">Copy</button>
+      </div>
+    </div>
+    <div>
+      <label>Friend code</label>
+      <div class="input-copy-group">
+        <input type="text" id="friend-code" placeholder="Enter code">
+        <button class="submit-btn" type="button">Submit</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <label>Your invite link</label>
+    <div class="input-copy-group">
+      <input type="text" value="https://evhub.space/invite/Your_code" id="invite-link" readonly>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
+    </div>
+  </div>
+  <div class="claim-info">
+    <div class="main-claim">
+     
+    </div>
+    <div class="presale-bonus">
+      
+      <span>Your Airdrop Panel</span>
+    </div>
+    <div class="details">
+   
+      
+    </div>
+  </div>
+  <div class="dashboard-btns">
+    <button class="claim-btn" type="button">Claim Airdrop</button>
+    <!-- <button class="presale-btn">Buy in Presale</button> -->
+  </div>
+</div>
+
+
+<!-- presale inikacija -->
+<section class="presale-container" id="presale">
+  <h2>Supercharge Sale</h2>
+    <div class="progress-wrapper">
+        <div class="progress-stats">
+          <p>
+            <strong>Total Raised:</strong> $<span id="live-total"
+              >0.00</span
+            >
+          </p>
+          <p>
+            <strong>Remaining:</strong> $<span id="live-remaining"
+              >1,600,000</span
+            >
+          </p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-text">0% completed</p>
+    </div>
+
+      <div class="form-box">
+        <p class="label">You Pay</p>
+        <div class="pay-input">
+          <input type="number" id="amount" placeholder="0.00" />
+          <select id="payment-token">
+            <option value="USDC">USDC</option>
+            <option value="BNB">BNB</option>
+          </select>
+        </div>
+
+        <p id="usd-equivalent" class="label">≈ $0.00</p>
+
+        <p class="label">You Receive</p>
+        <div class="receive-box">
+          <p id="token-output">0</p>
+          <img
+            src="/image/Ikona be fono.png"
+            alt="EVHUB Token"
+            class="token-icon"
+          />
+        </div>
+
+        <button id="buy-button">Buy EVHUB</button>
+        <p
+          id="hardcap-reached"
+          class="label"
+          style="display: none; color: #ff4c4c; font-weight: 600"
+        >
+          🚫 Hardcap reached – further purchases are disabled.
+        </p>
+      </div>
+</section>
+  
+
+
+<!-- Toast container -->
+<div id="toast" class="toast hidden">✅ Wallet connected</div>
+
+
+    <!-- Roadmap -->
+    <section class="roadmap" id="roadmap">
+      <h2>Our Roadmap</h2>
+      <p class="subtitle">
+        Our strategic plan to scale decentralized EV infrastructure globally.
+      </p>
+
+      <div class="timeline">
+  
+
+        <div class="phase">
+          <h3>Done</h3>
+          <h4>Q2 2025</h4>
+          <h3>Community Activation</h3>
+          <ul>
+            <li>Launch of Telegram community</li>
+            <li>Start of X (Twitter) marketing campaigns.</li>
+          </ul>
+        </div>
+
+        <div class="phase">
+          <h3>Next</h3>
+          <h4>Q3 2025</h4>
+          <h3>Whitepaper & Token Model</h3>
+          <ul>
+            <li>Completion and public release of the whitepaper</li>
+            <li>Tokenomics documentation finalization.</li>
+          </ul>
+        </div>
+
+      
+      </div>
+    </section>
+
+  
+    <!-- contact us -->
+    <section class="section contact" id="contact">
+    <div>
+
+      <h2>Get in Touch</h2>
+      <p>We're building in public. Connect with us:</p>
+
+    </div>
+      
+        
+      <div>
+
+        <ul class="contact-list">
+        <li>
+          <strong>Email:</strong>
+          <a href="mailto:evhub@evhub.space">evhub@evhub.space</a>
+        </li>
+        <li>
+          <strong>Telegram:</strong>
+          <a href="https://t.me/evhub_news" target="_blank">@evhub_news</a>
+        </li>
+        <li>
+          <strong>Telegram Community chat:</strong>
+          <a href="https://t.me/evhub_space" target="_blank">@evhub_space</a>
+        </li>
+        <li>
+          <strong>Twitter:</strong>
+          <a href="https://x.com/evhub_io" target="_blank">@evhub_io</a>
+        </li>
+      </div>
+      </ul>
+    </section>
+  </body>
+</html>
+
