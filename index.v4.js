@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ JS loaded and DOM fully parsed");
   const tokenPrice = 0.0002;
   const hardCap = 1600000;
-  const MINIMUM_USD = 1; // <- minimumas
+  const MINIMUM_USD = 20; // <- minimumas
   const claimBtn = document.querySelector(".claim-btn");
   const API_URL = "https://evhub-production.up.railway.app";
 
@@ -92,6 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
       tokenOutput.textContent = "0 tokens";
       usdDisplay.textContent = "≈ $0.00";
 
+      if (!currentAccount || isNaN(usd)) {
+        console.error("❌ Missing wallet or amount before /buy");
+        return;
+      }
+
       await fetch(`${API_URL}/buy`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
   currencySelect.addEventListener("change", updateTokenOutput);
 
   async function connectWallet() {
-    console.log("🟢 connectWallet called");
+    // console.log("🟢 connectWallet called");
     if (!window.ethereum) return showToast("⚠️ MetaMask not found");
 
     const requiredChainId = "0x38"; // BSC Mainnet
@@ -200,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${API_URL}/api/address`);
       const data = await res.json();
       recipientAddress = data.address;
-      console.log("✅ Recipient address loaded:", recipientAddress);
+      // console.log("✅ Recipient address loaded:", recipientAddress);
     } catch (err) {
       console.error("❌ Failed to load recipient address:", err);
       showToast("❌ Could not load payment address");
@@ -292,14 +297,11 @@ document.addEventListener("DOMContentLoaded", () => {
   async function airdropOnConnect(wallet) {
     if (!wallet) return;
     // Užregistruoti ar gauti kodą
-    const res = await fetch(
-      "http://localhost:3000/api/airdrop/register-wallet",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet }),
-      }
-    );
+    const res = await fetch(`${API_URL}/api/airdrop/register-wallet`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet }),
+    });
     const data = await res.json();
     if (airdropCodeInput) airdropCodeInput.value = data.code;
     if (airdropLinkInput)
@@ -313,12 +315,30 @@ document.addEventListener("DOMContentLoaded", () => {
   // Pakviestų žmonių atvaizdavimas
   async function updateAirdropStats(wallet) {
     if (!wallet) return;
-    const res = await fetch(
-      `http://localhost:3000/api/airdrop/wallet-stats/${wallet}`
-    );
-    const data = await res.json(); // Patikrinam ar buvo claim
+
+    const res = await fetch(`${API_URL}/api/airdrop/wallet-stats/${wallet}`);
+    const data = await res.json();
+
+    // Jei jau buvo claiminta
     if (data.claimed && data.claimInfo) {
-      // Čia atvaizduojam kiek gavo claim metu
+      // Jei yra naujų pakviestų draugų po claim
+      const newInvites = data.invited - data.invitedAtClaim;
+      if (newInvites > 0) {
+        // console.log("⏳ Claiming extra bonus for new invites...");
+        await fetch(`${API_URL}/api/airdrop/claim`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet }),
+        });
+
+        // Pakartotinai užkraunam atnaujintą info
+        const recheck = await fetch(
+          `${API_URL}/api/airdrop/wallet-stats/${wallet}`
+        );
+        Object.assign(data, await recheck.json());
+      }
+
+      // Atvaizduojam claim info
       airdropDetails.innerHTML = `
       <div>
         <b>You already claimed:</b><br>
@@ -330,14 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div>
         <b>You have invited: <span>${
           data.invitedAtClaim
-        }</span> (at claim time)</b>
-      </div>
-      <div>
-        ${
-          data.presaleAtClaim
-            ? "+25,000 bonus received for having presale"
-            : "No presale bonus at claim"
-        }
+        }</span> (auto claim)</b>
       </div>
       <div>
         <b>New invites after claim:</b> 
@@ -350,13 +363,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       </div>
     `;
-      // Disable claim mygtuką po claim
       if (claimBtn) claimBtn.disabled = true;
       return;
     }
 
-    // Jei dar neclaimino – skaičiuojam total
-    // Tikrinam presale (fetch buyers)
+    // Jei dar neclaimino – senoji logika
     let hasPresale = false;
     try {
       const buyersRes = await fetch(`${API_URL}/buyers`);
@@ -383,7 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Draugo kodo submit eventas
   if (airdropSubmitBtn) {
-    airdropSubmitBtn.addEventListener("click", async () => {
+    airdropSubmitBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!currentAccount) {
         await connectWallet();
         // connectWallet iškvies airdropOnConnect automatiškai
@@ -394,16 +407,17 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Įvesk draugo kodą!");
         return;
       }
-      const res = await fetch(
-        "http://localhost:3000/api/airdrop/refer-wallet",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ wallet: currentAccount, friendCode }),
-        }
-      );
-      const data = await res.json();
-      if (data.ok) {
+      const res = await fetch(`${API_URL}/api/airdrop/refer-wallet`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: currentAccount, friendCode }),
+      });
+      let data = {};
+      if (res.status !== 204) {
+        data = await res.json();
+      }
+
+      if (res.ok) {
         showToast("✅ Friend added!");
         await updateAirdropStats(currentAccount);
         friendCodeInput.disabled = true;
@@ -412,9 +426,36 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("❌ " + (data.error || "Referral klaida."));
       }
     });
-  }
+    if (claimBtn) {
+      claimBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Claim mygtukas paspaustas!");
+        if (!currentAccount) {
+          showToast("Please connect wallet first");
+          return;
+        }
+        try {
+          const res = await fetch(`${API_URL}/api/airdrop/claim`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ wallet: currentAccount.toLowerCase() }),
+          });
+          const data = await res.json();
 
-  // Kodų copy funkcijos (nereikia keisti)
+          if (data.claimed || data.alreadyClaimed) {
+            showToast("🎉 Claimed successfully!");
+            await updateAirdropStats(currentAccount);
+          } else {
+            showToast("❌ Claim failed!");
+          }
+        } catch (err) {
+          console.error("❌ Claim klaida:", err);
+          showToast("❌ Server error. Try again later.");
+        }
+      });
+    }
+  }
 });
 
 // Copy funkcijos (likusios nuo seno)
@@ -427,29 +468,4 @@ function copyLink() {
   const linkInput = document.getElementById("invite-link");
   linkInput.select();
   document.execCommand("copy");
-}
-
-// airdropm claim
-
-if (claimBtn) {
-  claimBtn.addEventListener("click", async () => {
-    console.log("Claim mygtukas paspaustas!");
-    if (!currentAccount) {
-      showToast("Please connect wallet first");
-      return;
-    }
-    // Siunčiam claim request
-    const res = await fetch("http://localhost:3000/api/airdrop/claim", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ wallet: currentAccount }),
-    });
-    const data = await res.json();
-    if (data.claimed || data.alreadyClaimed) {
-      showToast("🎉 Claimed successfully!");
-      await updateAirdropStats(currentAccount); // atnaujina dashboard'ą
-    } else {
-      showToast("❌ Claim failed!");
-    }
-  });
 }

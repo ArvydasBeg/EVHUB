@@ -4,7 +4,7 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  width: 1500px;
+  width: 1100px;
 }
 
 .logo {
@@ -115,10 +115,12 @@ nav a {
 .card-section {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  gap: 5rem;
   flex-wrap: wrap;
   padding: 2rem;
-  height: 400px;
+  height: 620px;
+  margin-top: -100px;
+  align-items: stretch;
 }
 
 .card-nft {
@@ -153,14 +155,14 @@ nav a {
 
 .card-image {
   position: relative;
-  left: -120px; /* kiek monetą įstumiam į tekstą */
+  left: -120px;
   top: 30px;
 }
 
 .card-image img {
   width: 240px;
   height: auto;
-  margin-left: -10px; /* pritraukia arčiau teksto */
+  margin-left: -10px;
 }
 
 .card p {
@@ -296,35 +298,13 @@ nav a {
   border: 2px solid rgb(225, 22, 222);
   transition: 0.5s;
 }
-/* tokenomic */
-
-.section {
-  padding: 4rem 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-.section h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-.tokenomics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-.tokenomics div {
-  background: #161b22;
-  padding: 1.5rem;
-  border-radius: 10px;
-  flex: 1 1 200px;
-}
 
 /* roadmap */
 .roadmap {
   color: white;
   padding: 4rem 2rem;
   text-align: center;
+  margin-top: -85px;
 }
 
 .roadmap h2 {
@@ -340,11 +320,11 @@ nav a {
 
 .timeline {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(20px, 400px));
   gap: 1.5rem;
-  justify-content: center;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: auto;
+  justify-content: center;
 }
 
 .phase {
@@ -359,11 +339,19 @@ nav a {
 
 .phase h4 {
   color: #46bac5;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
 }
 
-.phase h3 {
+.phase h3:first-of-type {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #00c3ff;
+  margin-top: 0;
+}
+
+.phase h3:not(:first-of-type) {
   font-size: 1.2rem;
   margin-bottom: 1rem;
 }
@@ -374,94 +362,21 @@ nav a {
   font-size: 0.95rem;
   color: #ddd;
 }
-
-/* token destribution */
-
-.token-distribution {
-  max-width: 960px;
-  margin: 0 auto;
-  text-align: center;
-  margin-bottom: 70px;
-}
-
-.token-distribution h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-}
-
-.token-chart {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 50px;
-}
-
-.chart {
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: conic-gradient(
-    #4cc9f0 0% 15%,
-    #4895ef 15% 20%,
-    #4361ee 20% 40%,
-    #3f37c9 40% 50%,
-    #560bad 50% 70%,
-    #7209b7 70% 85%,
-    #b5179e 85% 100%
-  );
-  position: relative;
-}
-
-/* Centrinis apskritimas (užmaskuoti vidų) */
-.chart::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100px;
-  height: 100px;
-  background-color: #0f0e1d; /* tas pats kaip background */
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.token-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.token-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-}
-
-.token-list span {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  background: var(--c);
-}
-
 /* presale */
 
 .presale-container {
+  display: flex;
   background: transparent;
-  padding: 2rem;
+  padding: 32px 28px 24px 28px;
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   width: 320px;
   text-align: center;
-  margin: auto;
-  margin-bottom: 100px;
   border: 2px solid;
   border-color: #74d2ff;
+  min-height: 450px;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .presale-container h2 {
@@ -603,67 +518,7 @@ select {
   text-align: right;
   opacity: 0.9;
 }
-/* leaderboardas */
-.presale-wrapper {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.leaderboard {
-  background: transparent;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  width: 320px;
-  text-align: center;
-  margin-bottom: 100px;
-  border: 2px solid;
-  border-color: #74d2ff;
-}
 
-.leaderboard h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-#leaderboard-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#leaderboard-list li {
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #2c3245;
-  padding-bottom: 0.5rem;
-  font-size: 0.95rem;
-  display: flex;
-  justify-content: space-between;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-#leaderboard-list li span {
-  font-weight: bold;
-  color: #00e0ff;
-}
-
-/* Animacija naujam įrašui */
-#leaderboard-list li.new-entry {
-  animation: slideIn 0.4s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-40%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
 /* toast conteiner */
 
 .toast {
@@ -735,4 +590,159 @@ select {
 
 .contact-list a:hover {
   text-decoration: underline;
+}
+
+/* airdrop */
+
+.airdrop-dashboard {
+  background: transparent;
+  border: 2px solid #74d2ff;
+  border-radius: 22px;
+  max-width: 320px;
+  height: 450px;
+  padding: 32px 28px 24px 28px;
+}
+.airdrop-dashboard.expanded {
+  height: auto; /* užleidžiam auto aukštį */
+}
+
+.airdrop-dashboard h2 {
+  color: #23baff;
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.row {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 20px;
+  justify-content: center;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.row > div {
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 7px;
+  color: #99cfff;
+}
+
+.input-copy-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-copy-group input {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  background: #182942;
+  color: #72e2ff;
+  padding: 10px 12px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.copy-btn,
+.submit-btn {
+  background: #182942;
+  color: #44e0ff;
+  border: 1.5px solid #44e0ff;
+  border-radius: 9px;
+  padding: 7px 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.18s;
+}
+.copy-btn:hover,
+.submit-btn:hover {
+  background: #23baff;
+  color: #101d2b;
+}
+
+.claim-info {
+  background: #182942;
+  border-radius: 10px;
+  padding: 18px 14px 10px 14px;
+  margin: 18px 0 20px 0;
+  text-align: center;
+}
+
+.main-claim {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  color: #eaf7ff;
+}
+
+.claim-amount {
+  color: #52ffb0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.presale-bonus {
+  color: #5cff93;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.details {
+  color: #a5badf;
+  font-size: 0.96rem;
+  margin-top: 4px;
+}
+
+.yes {
+  color: #64ffdc;
+  font-weight: bold;
+}
+
+.dashboard-btns {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.claim-btn,
+.presale-btn {
+  padding: 13px 0;
+  min-width: 140px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.claim-btn {
+  background: linear-gradient(90deg, #1b7bff, #38c8ff);
+  color: #fff;
+}
+
+.claim-btn:hover {
+  background: linear-gradient(90deg, #23baff, #3ed1ff);
+  color: #111;
+}
+
+.presale-btn {
+  background: linear-gradient(90deg, #2057ff, #56f3fa);
+  color: #fff;
+}
+
+.presale-btn:hover {
+  background: linear-gradient(90deg, #3fa3ff, #23e3ff);
+  color: #111;
 }

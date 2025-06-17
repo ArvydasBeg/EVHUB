@@ -14,12 +14,16 @@
 
     <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
-    <script src="./index.v3.js" defer></script>
+    <script src="./index.v4.js" defer></script>
 
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;700&display=swap");
     </style>
     <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="tablet.css" media="screen and (max-width: 770px)" />
+    <link rel="stylesheet" href="mobile.css" media="screen and (max-width: 550px)" />
+    <link rel="stylesheet" href="mini_phone.css" media="screen and (max-width: 429px)" />
+
     <script
       src="https://kit.fontawesome.com/58c83ef9b9.js"
       crossorigin="anonymous"
@@ -32,14 +36,14 @@
         <span>EVHUB</span>
       </div>
       <nav>
-        <a href="#roadmap">About</a>
+        <!-- <a href="#roadmap">About</a> -->
         <a href="#contact">Contact us</a>
         <a href="#roadmap">Roadmap</a>
         <a
           href="https://www.notion.so/EVHUB-Whitepaper-1eb0f0e6508480c79e67fe9a440b92d0?pvs=4"
           >Whitepaper</a
         >
-        <a href="#presale">NFTs</a>
+        <!-- <a href="#presale">NFTs</a> -->
         <a class="connect_wallet_button" href="#">Connect Wallet</a>
       </nav>
     </header>
@@ -49,43 +53,124 @@
         <div class="hero-text">
           <h1>BLOCKCHAIN-BASED<br />EV CHARGING<br />STATION NETWORK</h1>
           <p>Be part of the future. Charge. Earn. Own.</p>
-          <a href="#roadmap" class="button gradient">Learn More</a>
+          <a href="#airdrop-langas" class="button gradient">Airdrop is HERE</a>
         </div>
         <div class="hero-image">
           <img src="/image/stotele be fono.png" alt="EV Charging Station" />
         </div>
       </div>
     </section>
-    <!-- NFT ir coinas -->
+     <!-- AIRDROP ir PRESALE -->
+     <!-- AIRDROPAS -->
     <section class="card-section">
-      <div class="card-nft">
-        <div class="be-part">
-          <h3>Exclusive NFT</h3>
-          <h3>Collection</h3>
-          <p class="label">
-            Be part of our tokenized infrastructure ownership system.
+
+      <!-- AIRDROPAS -->
+<div class="airdrop-dashboard expended" id="airdrop-langas" >
+  <h2>Welcome to your FUTURE</h2>
+  <div class="row">
+    <div>
+      <label>Your code</label>
+      <div class="input-copy-group">
+        <input type="text" value="Your code" id="user-code" readonly>
+        <button class="copy-btn" onclick="copyCode()">Copy</button>
+      </div>
+    </div>
+    <div>
+      <label>Friend code</label>
+      <div class="input-copy-group">
+        <input type="text" id="friend-code" placeholder="Enter code">
+        <button class="submit-btn" type="button">Submit</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <label>Your invite link</label>
+    <div class="input-copy-group">
+      <input type="text" value="https://evhub.space/invite/Your_code" id="invite-link" readonly>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
+    </div>
+  </div>
+  <div class="claim-info">
+    <div class="main-claim">
+     
+    </div>
+    <div class="presale-bonus">
+      
+      <span>Your Airdrop Panel</span>
+    </div>
+    <div class="details">
+   
+      
+    </div>
+  </div>
+  <div class="dashboard-btns">
+    <button class="claim-btn" type="button">Claim Airdrop</button>
+    <!-- <button class="presale-btn">Buy in Presale</button> -->
+  </div>
+</div>
+
+
+<!-- presale inikacija -->
+<section class="presale-container" id="presale">
+  <h2>Supercharge Sale</h2>
+    <div class="progress-wrapper">
+        <div class="progress-stats">
+          <p>
+            <strong>Total Raised:</strong> $<span id="live-total"
+              >0.00</span
+            >
           </p>
-          <a href="#presale" class="button gradient">Coming Soon</a>
+          <p>
+            <strong>Remaining:</strong> $<span id="live-remaining"
+              >1,600,000</span
+            >
+          </p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-text">0% completed</p>
+    </div>
+
+      <div class="form-box">
+        <p class="label">You Pay</p>
+        <div class="pay-input">
+          <input type="number" id="amount" placeholder="0.00" />
+          <select id="payment-token">
+            <option value="USDC">USDC</option>
+            <option value="BNB">BNB</option>
+          </select>
         </div>
 
-        <div class="card-image">
-          <img src="/image/NFT be_fono.png" alt="NFT Cube" />
-        </div>
-      </div>
+        <p id="usd-equivalent" class="label">≈ $0.00</p>
 
-      <div class="presale-card">
-        <div class="presale-text">
-          <h3>Presale</h3>
-          <h3>is Live!</h3>
-          <p class="price">$0.0002</p>
-          <p class="label">Current Token Price</p>
-          <a href="#presale" class="button gradient">Buy Now</a>
+        <p class="label">You Receive</p>
+        <div class="receive-box">
+          <p id="token-output">0</p>
+          <img
+            src="/image/Ikona be fono.png"
+            alt="EVHUB Token"
+            class="token-icon"
+          />
         </div>
-        <div class="presale-image">
-          <img src="/image/coin be fono.png" alt="Token Icon" />
-        </div>
+
+        <button id="buy-button">Buy EVHUB</button>
+        <p
+          id="hardcap-reached"
+          class="label"
+          style="display: none; color: #ff4c4c; font-weight: 600"
+        >
+          🚫 Hardcap reached – further purchases are disabled.
+        </p>
       </div>
-    </section>
+</section>
+  
+
+
+<!-- Toast container -->
+<div id="toast" class="toast hidden">✅ Wallet connected</div>
+
+
     <!-- Roadmap -->
     <section class="roadmap" id="roadmap">
       <h2>Our Roadmap</h2>
@@ -94,15 +179,10 @@
       </p>
 
       <div class="timeline">
-        <div class="phase">
-          <h4>Q2 2025</h4>
-          <h3>Presale Stage 1</h3>
-          <ul>
-            <li>Limited EVHUB token sale for early private investors.</li>
-          </ul>
-        </div>
+  
 
         <div class="phase">
+          <h3>Done</h3>
           <h4>Q2 2025</h4>
           <h3>Community Activation</h3>
           <ul>
@@ -112,6 +192,7 @@
         </div>
 
         <div class="phase">
+          <h3>Next</h3>
           <h4>Q3 2025</h4>
           <h3>Whitepaper & Token Model</h3>
           <ul>
@@ -120,151 +201,11 @@
           </ul>
         </div>
 
-        <div class="phase">
-          <h4>Q3 2025</h4>
-          <h3>Presale Stage 2</h3>
-          <ul>
-            <li>Wider presale for whitelist participants.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q4 2025</h4>
-          <h3>Public Sale (IDO)</h3>
-          <ul>
-            <li>Token offering through a Launchpad or proprietary platform.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q1 2026</h4>
-          <h3>Token Listing</h3>
-          <ul>
-            <li>Listing on DEX/CEX exchanges.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q3 2026</h4>
-          <h3>DAO Infrastructure Build</h3>
-          <ul>
-            <li>Development of community governance system.</li>
-            <li>Launch of voting-enabled DAO.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q4 2026</h4>
-          <h3>Strategic Partnerships</h3>
-          <ul>
-            <li>Collaborations with Web3 & EV sector leaders.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q1 2027</h4>
-          <h3>NFT Model Launch</h3>
-          <ul>
-            <li>Ownership & revenue distribution model via NFTs.</li>
-          </ul>
-        </div>
-
-        <div class="phase">
-          <h4>Q2 2027</h4>
-          <h3>Construction Start</h3>
-          <ul>
-            <li>First EVHUB stations built using NFT ownership model.</li>
-          </ul>
-        </div>
+      
       </div>
     </section>
 
-    <!-- tokenomatic -->
-    <section class="token-distribution">
-      <h2>Token Distribution</h2>
-      <div class="token-chart">
-        <div class="chart"></div>
-        <ul class="token-list">
-          <li><span style="--c: #4cc9f0"></span> Team – 15%</li>
-          <li><span style="--c: #4895ef"></span> Advisors – 5%</li>
-          <li><span style="--c: #4361ee"></span> Private Sale – 20%</li>
-          <li><span style="--c: #3f37c9"></span> Public Sale (IDO) – 10%</li>
-          <li><span style="--c: #560bad"></span> Staking Rewards – 20%</li>
-          <li><span style="--c: #7209b7"></span> Ecosystem Fund – 15%</li>
-          <li><span style="--c: #b5179e"></span> Treasury – 10%</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- presale inikacija -->
-    <div class="presale-wrapper">
-      <div class="presale-left">
-        <!-- Tavo esama forma čia liks kaip yra -->
-        <section class="presale-container" id="presale">
-          <h2>Presale Stage 1</h2>
-
-          <div class="progress-wrapper">
-            <div class="progress-stats">
-              <p>
-                <strong>Total Raised:</strong> $<span id="live-total"
-                  >0.00</span
-                >
-              </p>
-              <p>
-                <strong>Remaining:</strong> $<span id="live-remaining"
-                  >1,600,000</span
-                >
-              </p>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="progress-fill"></div>
-            </div>
-            <p id="progress-text">0% completed</p>
-          </div>
-
-          <div class="form-box">
-            <p class="label">You Pay</p>
-            <div class="pay-input">
-              <input type="number" id="amount" placeholder="0.00" />
-              <select id="payment-token">
-                <option value="USDC">USDC</option>
-                <option value="BNB">BNB</option>
-              </select>
-            </div>
-
-            <p id="usd-equivalent" class="label">≈ $0.00</p>
-
-            <p class="label">You Receive</p>
-            <div class="receive-box">
-              <p id="token-output">0</p>
-              <img
-                src="/image/Ikona be fono.png"
-                alt="EVHUB Token"
-                class="token-icon"
-              />
-            </div>
-
-            <button id="buy-button">Buy EVHUB</button>
-            <p
-              id="hardcap-reached"
-              class="label"
-              style="display: none; color: #ff4c4c; font-weight: 600"
-            >
-              🚫 Hardcap reached – further purchases are disabled.
-            </p>
-          </div>
-        </section>
-      </div>
-      <!--<div class="leaderboard">-->
-      <!--  <h3>Live Board</h3>-->
-      <!--  <ul id="leaderboard-list">-->
-      <!--     Šie elementai bus pildomi dinamiškai -->
-      <!--  </ul>-->
-      <!--</div>-->
-    </div>
-    <!-- Toast container -->
-    <div id="toast" class="toast hidden">✅ Wallet connected</div>
-
+  
     <!-- contact us -->
     <section class="section contact" id="contact">
     <div>
@@ -299,4 +240,4 @@
     </section>
   </body>
 </html>
->
+
