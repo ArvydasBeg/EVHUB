@@ -6,7 +6,7 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Saugus CORS
 app.use(
   cors({
     origin: ["https://evhub.space", "https://www.evhub.space"],
@@ -15,9 +15,28 @@ app.use(
   })
 );
 app.options("*", cors());
+
+// Leidžia JSON užklausas
 app.use(express.json());
 
-app.use(express.static("public"));
+// Rodyk viską iš šaknies, bet ignoruok pavojingus failus
+app.use((req, res, next) => {
+  const blocked = [
+    "/buyers.txt",
+    "/walletAirdropReferrals.json",
+    "/totalRaised.json",
+  ];
+  if (blocked.includes(req.url)) return res.status(403).send("❌ Forbidden");
+  next();
+});
+
+// Statiniai failai – leidžia krauti index.html, js, css, image
+app.use(express.static(__dirname));
+
+// Fallback į index.html (React-style routing ar /invite/xxx)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 // WALLET-BASED AIRDROP REFERRAL SYSTEM
 const WALLET_REFERRAL_FILE = "walletAirdropReferrals.json";
