@@ -14,6 +14,7 @@ app.use(
     allowedHeaders: ["Content-Type"],
   })
 );
+app.options("*", cors());
 app.use(express.json());
 
 app.use(express.static("public"));
@@ -177,10 +178,6 @@ app.get("/buyers.txt", (req, res) => {
     return res.status(403).send("❌ Unauthorized");
   }
   res.sendFile(path.join(__dirname, "buyers.txt"));
-});
-
-app.get("/api/address", (req, res) => {
-  res.json({ address: "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374" });
 });
 
 app.get("/api/address", (req, res) => {
