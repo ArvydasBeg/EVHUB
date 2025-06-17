@@ -5,7 +5,7 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log("STARTED WITH PORT:", process.env.PORT);
+
 // Saugus CORS
 app.use(
   cors({
@@ -284,8 +284,22 @@ app.post("/api/airdrop/claim", (req, res) => {
   res.json({ claimed: true, claimInfo: data[address].claimInfo });
 });
 
-// servo paleidimas
+// =================== UNIVERSALUS Fallback (pats galas!) ===================
 
+// GET / pagrindinis (jei reikia):
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// Fallback visiems kitiems – tik NE API
+app.get("*", (req, res) => {
+  if (req.originalUrl.startsWith("/api/")) {
+    return res.status(404).json({ error: "API not found" });
+  }
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// servo paleidimas
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
