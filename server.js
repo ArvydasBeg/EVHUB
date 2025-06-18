@@ -296,7 +296,7 @@ app.get("*", (req, res) => {
   if (req.originalUrl.startsWith("/api/")) {
     return res.status(404).json({ error: "API not found" });
   }
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // servo paleidimas
