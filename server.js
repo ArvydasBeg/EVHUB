@@ -34,9 +34,9 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname));
 
 // Fallback į index.html (React-style routing ar /invite/xxx)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
+// });
 
 // WALLET-BASED AIRDROP REFERRAL SYSTEM
 const WALLET_REFERRAL_FILE = "walletAirdropReferrals.json";
@@ -286,10 +286,10 @@ app.post("/api/airdrop/claim", (req, res) => {
 
 // =================== UNIVERSALUS Fallback (pats galas!) ===================
 
-// GET / pagrindinis (jei reikia):
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// // GET / pagrindinis (jei reikia):
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
+// });
 
 // Fallback visiems kitiems – tik NE API
 app.get("*", (req, res) => {
