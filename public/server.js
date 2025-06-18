@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 // Statiniai failai – leidžia krauti index.html, js, css, image
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Fallback į index.html (React-style routing ar /invite/xxx)
 // app.get("*", (req, res) => {
