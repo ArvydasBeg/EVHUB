@@ -284,6 +284,31 @@ app.post("/api/airdrop/claim", (req, res) => {
   res.json({ claimed: true, claimInfo: data[address].claimInfo });
 });
 
+
+// === BACKUP ENDPOINT ===
+
+app.get("/admin-backup", (req, res) => {
+  const key = req.query.key;
+  if (key !== "Arvydas123") return res.status(403).send("❌ Forbidden");
+
+  const files = [
+    "buyers.txt",
+    "walletAirdropReferrals.json",
+    "totalRaised.json"
+  ];
+  const backup = {};
+  files.forEach((filename) => {
+    if (fs.existsSync(filename)) {
+      backup[filename] = fs.readFileSync(filename, "utf8");
+    } else {
+      backup[filename] = "";
+    }
+  });
+  res.json(backup);
+});
+
+
+
 // =================== UNIVERSALUS Fallback (pats galas!) ===================
 
 // // GET / pagrindinis (jei reikia):
