@@ -2,9 +2,53 @@ const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
+const { ethers } = require("ethers"); // PRIDĖK prie kitų require
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// --- Ethers provider setup ---
+const BSC_RPC = "https://bsc-dataseed.binance.org/";
+const provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
+
+// TX validavimo util
+async function validateTransaction(
+  txHash,
+  { wallet, recipient, value, currency }
+) {
+  const tx = await provider.getTransaction(txHash);
+  if (!tx) return false;
+
+  if (currency === "BNB") {
+    return (
+      tx.from.toLowerCase() === wallet.toLowerCase() &&
+      tx.to.toLowerCase() === recipient.toLowerCase() &&
+      parseFloat(ethers.utils.formatEther(tx.value)) >=
+        parseFloat(value) - 0.00001
+    );
+  } else if (currency === "USDC") {
+    const receipt = await provider.getTransactionReceipt(txHash);
+    if (!receipt || !receipt.logs) return false;
+
+    const USDC_ADDRESS = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d";
+    for (const log of receipt.logs) {
+      if (
+        log.address.toLowerCase() === USDC_ADDRESS.toLowerCase() &&
+        log.topics.length === 3 &&
+        `0x${log.topics[1].slice(26)}`.toLowerCase() === wallet.toLowerCase() &&
+        `0x${log.topics[2].slice(26)}`.toLowerCase() === recipient.toLowerCase()
+      ) {
+        // 18 DECIMALS! (jei pas tave USDC su 6 – pakeisk čia)
+        const decimals = 18;
+        const transferred = parseFloat(
+          ethers.utils.formatUnits(log.data, decimals)
+        );
+        if (Math.abs(transferred - parseFloat(value)) < 0.0001) return true;
+      }
+    }
+  }
+  return false;
+}
 
 // Saugus CORS
 app.use(
@@ -89,6 +133,22 @@ app.post("/api/airdrop/refer-wallet", (req, res) => {
   if (!friendWallet)
     return res.status(400).json({ error: "Friend code not found" });
 
+  // --- ČIA NAUJAS LIMITAS ---
+  const buyersRaw = fs.existsSync("buyers.txt")
+    ? fs.readFileSync("buyers.txt", "utf8")
+    : "";
+  const isPresale = buyersRaw
+    .split("\n")
+    .map((line) => line.split("|")[0].trim().toLowerCase())
+    .includes(friendWallet.toLowerCase());
+
+  // Limit only if NOT presale
+  if (!isPresale && data[friendWallet].invited.length >= 5) {
+    return res.status(400).json({
+      error: "Max 5 invites allowed before presale. Do presale to invite more!",
+    });
+  }
+
   if (!data[friendWallet].invited.includes(address)) {
     data[friendWallet].invited.push(address);
     data[address].invitedBy = friendCode;
@@ -120,22 +180,38 @@ app.get("/api/airdrop/wallet-stats/:wallet", (req, res) => {
 // --- žemiau gali būti visi pirkimai, presale ir t.t. ---
 
 // === POST /buy endpoint ===
-app.post("/buy", (req, res) => {
-  const { wallet, amount } = req.body;
-  if (!wallet || !amount) {
-    return res.status(400).send("Invalid input");
+app.post("/buy", async (req, res) => {
+  const { wallet, amount, txHash, currency, value } = req.body;
+  if (!wallet || !amount || !txHash || !currency || !value) {
+    return res.status(400).send("Missing fields");
   }
-  const entry = `${wallet.trim().toLowerCase()} | ${parseFloat(amount).toFixed(
-    2
-  )}\n`;
-  fs.appendFile("buyers.txt", entry, (err) => {
-    if (err) {
-      console.error("❌ Failed to write to file:", err);
-      return res.status(500).send("Server error writing to file");
+  const recipient = "0x2E41c430CA8aa18bF32e1AFA926252865dBc0374";
+  try {
+    const valid = await validateTransaction(txHash, {
+      wallet,
+      recipient,
+      value,
+      currency,
+    });
+    if (!valid) {
+      return res.status(400).send("TX not valid or not confirmed");
     }
-    console.log("✅ Buyer saved:", entry.trim());
-    res.status(200).send("Saved");
-  });
+    // Tik tada rašom į buyers.txt ir update-raised!
+    const entry = `${wallet.trim().toLowerCase()} | ${parseFloat(
+      amount
+    ).toFixed(2)} | ${txHash}\n`;
+    fs.appendFile("buyers.txt", entry, (err) => {
+      if (err) {
+        console.error("❌ Failed to write to file:", err);
+        return res.status(500).send("Server error writing to file");
+      }
+      console.log("✅ Buyer saved:", entry.trim());
+      res.status(200).send("Saved");
+    });
+  } catch (e) {
+    console.error("❌ TX validation error:", e);
+    res.status(500).send("TX validation error");
+  }
 });
 
 app.get("/buyers", (req, res) => {
@@ -283,31 +359,6 @@ app.post("/api/airdrop/claim", (req, res) => {
   writeWalletReferrals(data);
   res.json({ claimed: true, claimInfo: data[address].claimInfo });
 });
-
-
-// === BACKUP ENDPOINT ===
-
-app.get("/admin-backup", (req, res) => {
-  const key = req.query.key;
-  if (key !== "Arvydas123") return res.status(403).send("❌ Forbidden");
-
-  const files = [
-    "buyers.txt",
-    "walletAirdropReferrals.json",
-    "totalRaised.json"
-  ];
-  const backup = {};
-  files.forEach((filename) => {
-    if (fs.existsSync(filename)) {
-      backup[filename] = fs.readFileSync(filename, "utf8");
-    } else {
-      backup[filename] = "";
-    }
-  });
-  res.json(backup);
-});
-
-
 
 // =================== UNIVERSALUS Fallback (pats galas!) ===================
 
