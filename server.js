@@ -367,6 +367,26 @@ app.post("/api/airdrop/claim", (req, res) => {
 //   res.sendFile(path.join(__dirname, "index.html"));
 // });
 
+app.get("/admin-backup", (req, res) => {
+  const key = req.query.key;
+  if (key !== "Arvydas123") return res.status(403).send("❌ Forbidden");
+
+  const files = [
+    "buyers.txt",
+    "walletAirdropReferrals.json",
+    "totalRaised.json",
+  ];
+  const backup = {};
+  files.forEach((filename) => {
+    if (fs.existsSync(filename)) {
+      backup[filename] = fs.readFileSync(filename, "utf8");
+    } else {
+      backup[filename] = "";
+    }
+  });
+  res.json(backup);
+});
+
 // Fallback visiems kitiems – tik NE API
 app.get("*", (req, res) => {
   if (req.originalUrl.startsWith("/api/")) {
